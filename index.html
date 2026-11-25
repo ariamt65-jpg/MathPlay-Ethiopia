@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Three interactive mathematics games by MathPlay Ethiopia, created for secondary-school learners.">
+  <title>MathPlay Ethiopia | Game Portfolio</title>
+  <style>
+    :root {
+      --navy: #2C3E50;
+      --red: #E74C3C;
+      --blue: #3498DB;
+      --paper: #F4F6F8;
+      --white: #FFFFFF;
+      --muted: #64748B;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--navy);
+      background: var(--paper);
+      line-height: 1.6;
+    }
+    .wrap { width: min(920px, 92%); margin: 0 auto; }
+    header { padding: 24px 0; }
+    .brand { font-size: 1.15rem; font-weight: 800; letter-spacing: .2px; }
+    .hero {
+      background: linear-gradient(135deg, var(--navy), #405D78);
+      color: var(--white);
+      padding: 56px 28px;
+      border-radius: 18px;
+      text-align: center;
+      margin: 12px 0 38px;
+    }
+    .hero h1 { margin: 0 0 12px; font-size: clamp(2rem, 6vw, 3rem); line-height: 1.15; }
+    .hero p { max-width: 650px; margin: 0 auto; color: #E8EEF4; font-size: 1.05rem; }
+    .eyebrow {
+      color: #FFD5CF;
+      text-transform: uppercase;
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+    }
+    .section-title { margin: 0 0 8px; font-size: 1.7rem; }
+    .intro { margin: 0 0 22px; color: var(--muted); }
+    .games {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 18px;
+      margin-bottom: 42px;
+    }
+    .game {
+      background: var(--white);
+      border: 1px solid #E1E7ED;
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 6px 20px rgba(44, 62, 80, .07);
+      display: flex;
+      flex-direction: column;
+      min-height: 220px;
+    }
+    .number {
+      width: 42px; height: 42px;
+      display: grid; place-items: center;
+      border-radius: 11px;
+      color: var(--white);
+      background: var(--red);
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+    .game h3 { margin: 0 0 8px; font-size: 1.2rem; }
+    .game p { margin: 0 0 20px; color: var(--muted); font-size: .95rem; }
+    .play {
+      display: inline-block;
+      margin-top: auto;
+      align-self: flex-start;
+      padding: 10px 17px;
+      border-radius: 8px;
+      background: var(--blue);
+      color: var(--white);
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .play:hover, .play:focus { background: var(--navy); }
+    .about {
+      background: var(--white);
+      border-left: 4px solid var(--red);
+      padding: 20px 22px;
+      border-radius: 10px;
+      margin-bottom: 42px;
+    }
+    .about h2 { margin: 0 0 7px; font-size: 1.25rem; }
+    .about p { margin: 0; color: var(--muted); }
+    footer {
+      border-top: 1px solid #DCE3E9;
+      padding: 22px 0 30px;
+      color: var(--muted);
+      font-size: .9rem;
+      text-align: center;
+    }
+    @media (max-width: 520px) {
+      .hero { padding: 42px 20px; }
+      .game { min-height: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header class="wrap">
+    <div class="brand">MathPlay Ethiopia</div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="eyebrow">Interactive mathematics games</div>
+      <h1>Learn mathematics by playing.</h1>
+      <p>A small portfolio of interactive mathematics games developed for secondary-school learners in Ethiopia.</p>
+    </section>
+
+    <section aria-labelledby="games-heading">
+      <h2 class="section-title" id="games-heading">Featured Games</h2>
+      <p class="intro">Choose a game below to open it.</p>
+
+      <div class="games">
+        <article class="game">
+          <div class="number">01</div>
+          <h3>Number Ninja</h3>
+          <p>Practise identifying and classifying different types of numbers through an interactive game.</p>
+          <a class="play" href="Number%20Ninja.html">Play Number Ninja</a>
+        </article>
+
+        <article class="game">
+          <div class="number">02</div>
+          <h3>Polygon Peril Pro</h3>
+          <p>Explore polygon concepts and test your mathematical thinking in an interactive challenge.</p>
+          <a class="play" href="Polygon%20Peril%20Pro.html">Play Polygon Peril Pro</a>
+        </article>
+
+        <article class="game">
+          <div class="number">03</div>
+          <h3>Venn Diagram Challenge</h3>
+          <p>Work with sets and Venn diagrams in an interactive mathematics challenge.</p>
+          <a class="play" href="Venn-Diagram-Challenge.html">Play Venn Diagram Challenge</a>
+        </article>
+      </div>
+    </section>
+
+    <section class="about">
+      <h2>About the project</h2>
+      <p>MathPlay Ethiopia is an independent educational project developing interactive, process-based mathematics games aligned with the Ethiopian secondary-school curriculum. This page presents three selected games.</p>
+    </section>
+  </main>
+
+  <footer>
+    MathPlay Ethiopia · A mathematics game portfolio
+  </footer>
+</body>
+</html>
