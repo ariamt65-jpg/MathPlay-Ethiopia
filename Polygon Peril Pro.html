@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Polygon Peril Pro | MathPlay Ethiopia</title>
+    <meta name="description" content="Master polygon geometry by molding shapes! Learn convex, concave, and complex polygons through interactive gameplay.">
+    <meta name="keywords" content="Mathematics games, Ethiopia math, Geometry, Polygons, Convex, Concave, Complex shapes, Educational games, MathPlay">
+    <meta name="author" content="MathPlay Ethiopia">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ----------  MATHPLAY ETHIOPIA THEME  ---------- */
+        :root {
+            --primary: #2C3E50;
+            --secondary: #E74C3C;
+            --accent: #3498DB;
+            --light: #F8F9FA;
+            --dark: #2C3E50;
+            --yellow: #F1C40F;
+            --green: #27AE60;
+            --purple: #9B59B6;
+            --orange: #E67E22;
+            --text-dim: #6b7785;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius: 12px;
+        }
+        *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+        html,body{height:100%;width:100%}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--light);color:var(--dark);width:100%;overflow-y: auto; -webkit-overflow-scrolling: touch}
+        .game-container{min-height:100vh;width:100%;max-width:500px;margin:0 auto;display:flex;flex-direction:column;background:white}
+        
+        /* Game Header */
+        .game-header{background:linear-gradient(135deg,var(--primary),var(--secondary));color:white;padding:10px 12px 8px;flex-shrink:0;box-shadow:0 2px 10px rgba(0,0,0,.1);position:sticky;top:0;z-index:100}
+        .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+        .back-btn{background:rgba(255,255,255,.2);border:none;width:44px;height:44px;border-radius:50%;color:white;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition);box-shadow:0 0 15px rgba(255,255,255,.3)}
+        .back-btn:hover{background:rgba(255,255,255,.3);box-shadow:0 0 20px rgba(255,255,255,.5);transform:scale(1.1)}
+        .back-btn:active{transform:scale(0.95)}
+        .game-title{font-size:1.1rem;font-weight:700;text-align:center;flex:1;padding:0 6px}
+        .score-panel{display:flex;gap:8px;margin-bottom:8px;justify-content:center}
+        .score-item{background:rgba(255,255,255,.2);border-radius:8px;padding:5px 10px;display:flex;align-items:center;gap:6px;font-weight:600;font-size:.75rem}
+        .score-item .value{background:white;color:var(--primary);padding:1px 6px;border-radius:10px;min-width:25px;text-align:center;font-size:.8rem}
+        
+        /* Standard Objective Panel (in header) */
+        .objective-panel{background:rgba(255,255,255,.95);border-radius:6px;padding:8px 10px;box-shadow:0 2px 8px rgba(0,0,0,.1);border-left:3px solid var(--accent);margin-bottom:6px}
+        .objective-text{color:var(--dark);font-size:.75rem;line-height:1.3;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        
+        .progress-container{background:rgba(255,255,255,.2);border-radius:6px;height:3px;overflow:hidden}
+        .progress-bar{background:linear-gradient(90deg,var(--accent),var(--green));height:100%;width:0%;transition:width .3s ease}
+        
+        /* Game Content */
+        .game-content{flex:1;display:flex;flex-direction:column;padding:10px;gap:8px;overflow:visible}
+        
+        /* Objective Card (New Design below header) */
+        .objective-card{background:white;border-radius:var(--radius);padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);flex-shrink:0;margin-top:4px;border-left:5px solid var(--accent)}
+        .obj-icon{width:42px;height:42px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:10px;color:white;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;box-shadow:0 4px 10px rgba(52, 152, 219, .3)}
+        .obj-content{flex:1;min-width:0}
+        .obj-label{font-size:.65rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:1px}
+        .obj-target{font-size:1.05rem;font-weight:700;color:var(--primary);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .obj-hint{font-size:.7rem;color:var(--text-dim);font-weight:600;margin-top:2px}
+        
+        /* Canvas Container */
+        .canvas-container{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);background:#020617;position:relative;height:360px;width:100%}
+        
+        /* Action Buttons */
+        .action-buttons-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:0;flex-shrink:0}
+        .action-btn{padding:12px;border-radius:var(--radius);border:none;font-weight:700;font-size:.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;box-shadow:var(--shadow);transition:var(--transition)}
+        .check-btn{background:linear-gradient(135deg,var(--accent),var(--purple));color:white}
+        .check-btn:disabled{opacity:.5;cursor:not-allowed}
+        .reset-btn{background:var(--light);color:var(--dark);border:2px solid var(--accent)}
+        .add-btn{background:linear-gradient(135deg,var(--green),#2ecc71);color:white}
+        
+        /* Micro-lesson Bar */
+        .operations-bar{background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);border-radius:var(--radius);padding:10px;color:white;box-shadow:var(--shadow);flex-shrink:0}
+        .operations-bar .inner{display:flex;align-items:center;justify-content:space-between}
+        .operations-bar .text{font-size:.75rem;font-weight:700;display:flex;align-items:center;gap:4px}
+        .op-btn{background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.3);border-radius:6px;padding:6px 10px;color:white;font-weight:700;font-size:.8rem;cursor:pointer;transition:var(--transition)}
+        .op-btn:hover{background:rgba(255,255,255,.3);transform:translateY(-1px)}
+        
+        /* Instructions Panel */
+        .instructions-panel{background:var(--light);border-radius:var(--radius);padding:10px 12px;box-shadow:var(--shadow);flex-shrink:0;border-left:3px solid var(--yellow)}
+        .instructions-text{font-size:.75rem;color:var(--dark);line-height:1.3;font-weight:600;display:flex;align-items:center;gap:6px}
+        
+        /* Ad Container */
+        .ad-container{background:white;border-radius:8px;padding:6px;margin-top:0;border:1px solid rgba(0,0,0,.1);text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.05);flex-shrink:0}
+        .ad-label{font-size:.65rem;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;font-weight:600}
+        .ad-content{background:linear-gradient(135deg,#f8f9fa,#e9ecef);border-radius:6px;padding:12px 8px;color:#666;font-size:.7rem;border:1px dashed #ddd;display:flex;align-items:center;justify-content:center;flex-direction:column}
+        
+        /* Overlays (Modals) */
+        .lesson-overlay,.feedback-overlay,.completion-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;visibility:hidden;transition:all .3s ease}
+        .lesson-overlay.show,.feedback-overlay.show,.completion-overlay.show{opacity:1;visibility:visible}
+        .lesson-card,.feedback-card,.completion-card{background:white;border-radius:var(--radius);padding:20px;max-width:350px;width:90%;box-shadow:0 15px 30px rgba(0,0,0,.3)}
+        .lesson-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+        .lesson-title{font-size:1.1rem;font-weight:700;color:var(--primary);display:flex;align-items:center;gap:6px}
+        .close-lesson{background:rgba(52,152,219,.1);border:none;width:30px;height:30px;border-radius:50%;color:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center}
+        .lesson-content{color:var(--dark);line-height:1.4;font-size:.85rem;margin-bottom:15px}
+        .lesson-example{background:rgba(52,152,219,.1);border-radius:6px;padding:10px;margin-top:12px;font-size:.8rem}
+        .lesson-btn{background:linear-gradient(135deg,var(--accent),var(--purple));color:white;border:none;padding:10px 20px;border-radius:var(--radius);font-weight:700;font-size:.85rem;cursor:pointer;transition:var(--transition);width:100%;margin-top:8px}
+        .feedback-icon{font-size:2.5rem;margin-bottom:12px;text-align:center}
+        .feedback-title{font-size:1.2rem;font-weight:700;margin-bottom:8px;color:var(--primary);text-align:center}
+        .feedback-message{color:var(--dark);margin-bottom:15px;line-height:1.4;font-size:.85rem;text-align:center}
+        .feedback-btn{background:linear-gradient(135deg,var(--secondary),var(--orange));color:white;border:none;padding:12px 20px;border-radius:var(--radius);font-weight:700;font-size:.9rem;cursor:pointer;transition:var(--transition);width:100%}
+        .completion-card{text-align:center}
+        .completion-title{font-size:1.5rem;font-weight:700;color:var(--primary);margin-bottom:8px}
+        .completion-subtitle{font-size:1.1rem;color:var(--accent);margin-bottom:15px}
+        .completion-message{color:var(--dark);margin-bottom:20px;line-height:1.4;font-size:.9rem}
+        .completion-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+        .completion-btn{padding:12px;border-radius:var(--radius);border:none;font-weight:700;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;box-shadow:var(--shadow);transition:var(--transition)}
+        .play-again-btn{background:linear-gradient(135deg,var(--accent),var(--purple));color:white}
+        .home-btn{background:var(--light);color:var(--dark);border:2px solid var(--accent)}
+        
+        /* Animations */
+        @keyframes bounceIn{0%{transform:scale(.3);opacity:0}50%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+        .bounce-in{animation:bounceIn .3s ease}
+        @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+        .shake{animation:shake .5s ease}
+        
+        .seo-content{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+        @media (max-width:380px){.game-title{font-size:1rem}.score-panel{gap:4px}.score-item{padding:4px 6px;font-size:.7rem}.action-btn{font-size:.7rem;padding:10px 4px}}
+        
+        /* Game Canvas */
+        canvas { width: 100%; height: 100%; display: block; touch-action: none; }
+        
+        /* Number type indicators */
+        .number-type-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+        .integer-badge { background: var(--accent); color: white; }
+        .irrational-badge { background: var(--secondary); color: white; }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <div class="header-top">
+                <button class="back-btn" id="backBtn" aria-label="Go back"><i class="fas fa-arrow-left"></i></button>
+                <h1 class="game-title">Polygon Peril Pro</h1>
+                <div style="width:44px"></div>
+            </div>
+            <div class="score-panel">
+                <div class="score-item"><i class="fas fa-star" style="color:var(--yellow)"></i><span>Score:</span><span class="value" id="score">0</span></div>
+                <div class="score-item"><i class="fas fa-trophy" style="color:var(--green)"></i><span>Level:</span><span class="value" id="level">1/12</span></div>
+                <div class="score-item"><i class="fas fa-heart" style="color:var(--secondary)"></i><span>Lives:</span><span class="value" id="lives">3</span></div>
+            </div>
+            <!-- Standard Objective Panel -->
+            <div class="objective-panel">
+                <p class="objective-text" id="objectiveText">Create the target polygon shape!</p>
+            </div>
+            <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+        </header>
+
+        <main class="game-content">
+            <!-- Objective Card (New Design) -->
+            <div class="objective-card">
+                <div class="obj-icon"><i class="fas fa-draw-polygon"></i></div>
+                <div class="obj-content">
+                    <div class="obj-label">Current Mission</div>
+                    <div class="obj-target" id="targetDisplay">Convex Quadrilateral</div>
+                    <div class="obj-hint" id="missionHint">4 sides, no dents</div>
+                </div>
+                <span id="shapeTypeBadge" class="integer-badge number-type-badge">Convex</span>
+            </div>
+
+            <!-- Game Canvas -->
+            <div class="canvas-container">
+                <canvas id="gameCanvas"></canvas>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons-3">
+                <button class="action-btn add-btn" id="addVertexBtn"><i class="fas fa-plus"></i>Vertex</button>
+                <button class="action-btn reset-btn" id="resetBtn"><i class="fas fa-redo"></i>Reset</button>
+                <button class="action-btn check-btn" id="submitBtn"><i class="fas fa-check"></i>Submit</button>
+            </div>
+
+            <!-- Micro-lesson Bar -->
+            <div class="operations-bar" id="lessonBar">
+                <div class="inner">
+                    <div class="text"><i class="fas fa-graduation-cap"></i><span>Micro-lesson: Polygon Types</span></div>
+                    <button class="op-btn" id="openLessonBtn">Learn More</button>
+                </div>
+            </div>
+
+            <!-- Instructions Panel -->
+            <div class="instructions-panel">
+                <p class="instructions-text"><i class="fas fa-info-circle" style="color:var(--accent)"></i> Drag vertices to mold the shape. Double-tap a vertex to remove it.</p>
+            </div>
+
+            <!-- Ad Container -->
+            <div class="ad-container" aria-label="Advertisement">
+                <div class="ad-label">Sponsored</div>
+                <div class="ad-content"><div class="ad-placeholder">Ad Space</div></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- =====  MICRO-LESSON MODAL  ===== -->
+    <div class="lesson-overlay" id="lessonOverlay">
+        <div class="lesson-card">
+            <div class="lesson-header">
+                <h2 class="lesson-title"><i class="fas fa-graduation-cap"></i>Polygon Geometry</h2>
+                <button class="close-lesson" id="closeLesson"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="lesson-content">
+                <p>Polygons are closed 2D shapes with straight sides. They are classified by their interior angles:</p>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                    <li><strong>Convex:</strong> All interior angles less than 180°. No dents.</li>
+                    <li><strong>Concave:</strong> At least one interior angle greater than 180°. Has an inward dent.</li>
+                    <li><strong>Complex:</strong> Edges cross each other. Not a simple polygon.</li>
+                </ul>
+                <p>Use the vertices to mold the shape to match the target exactly!</p>
+            </div>
+            <div class="lesson-example">
+                <div style="font-weight:700;margin-bottom:4px">Current Level Focus:</div>
+                <div id="levelFocus">Level 1: Convex Quadrilateral</div>
+            </div>
+            <button class="lesson-btn" id="closeLessonBtn">Got it, let's continue!</button>
+        </div>
+    </div>
+
+    <!-- =====  FEEDBACK MODAL  ===== -->
+    <div class="feedback-overlay" id="feedbackOverlay">
+        <div class="feedback-card">
+            <div class="feedback-icon" id="feedbackIcon">✅</div>
+            <h2 class="feedback-title" id="feedbackTitle">Perfect!</h2>
+            <p class="feedback-message" id="feedbackMessage">You created the correct shape.</p>
+            <button class="feedback-btn" id="nextBtn">Continue</button>
+        </div>
+    </div>
+
+    <!-- =====  COMPLETION MODAL  ===== -->
+    <div class="completion-overlay" id="completionOverlay">
+        <div class="completion-card">
+            <div style="font-size:3rem;margin-bottom:12px">🏆</div>
+            <h2 class="completion-title" id="completionTitle">Geometry Master!</h2>
+            <div class="completion-subtitle">Final Score: <span id="finalScore">0</span></div>
+            <div class="completion-subtitle">Levels Reached: <span id="finalLevel">1</span></div>
+            <p class="completion-message" id="completionMessage">You mastered all the polygon shapes!</p>
+            <div class="completion-buttons">
+                <button class="completion-btn play-again-btn" id="playAgainBtn"><i class="fas fa-redo"></i>Play Again</button>
+                <button class="completion-btn home-btn" id="homeBtn"><i class="fas fa-home"></i>Back to Home</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="seo-content">
+        <h1>Polygon Peril Pro - Interactive Geometry Game</h1>
+        <p>Master polygon geometry through interactive gameplay! Learn the difference between convex, concave, and complex polygons while developing spatial reasoning skills.</p>
+    </div>
+
+    <script>
+        // ========== SETUP & DOM ==========
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const el = {
+            score: document.getElementById('score'),
+            level: document.getElementById('level'),
+            lives: document.getElementById('lives'),
+            objectiveText: document.getElementById('objectiveText'),
+            progressBar: document.getElementById('progressBar'),
+            targetDisplay: document.getElementById('targetDisplay'),
+            missionHint: document.getElementById('missionHint'),
+            shapeTypeBadge: document.getElementById('shapeTypeBadge'),
+            lessonOverlay: document.getElementById('lessonOverlay'),
+            closeLesson: document.getElementById('closeLesson'),
+            closeLessonBtn: document.getElementById('closeLessonBtn'),
+            openLessonBtn: document.getElementById('openLessonBtn'),
+            levelFocus: document.getElementById('levelFocus'),
+            feedbackOverlay: document.getElementById('feedbackOverlay'),
+            feedbackIcon: document.getElementById('feedbackIcon'),
+            feedbackTitle: document.getElementById('feedbackTitle'),
+            feedbackMessage: document.getElementById('feedbackMessage'),
+            nextBtn: document.getElementById('nextBtn'),
+            completionOverlay: document.getElementById('completionOverlay'),
+            finalScore: document.getElementById('finalScore'),
+            finalLevel: document.getElementById('finalLevel'),
+            completionTitle: document.getElementById('completionTitle'),
+            completionMessage: document.getElementById('completionMessage'),
+            playAgainBtn: document.getElementById('playAgainBtn'),
+            homeBtn: document.getElementById('homeBtn'),
+            submitBtn: document.getElementById('submitBtn'),
+            resetBtn: document.getElementById('resetBtn'),
+            addVertexBtn: document.getElementById('addVertexBtn'),
+            backBtn: document.getElementById('backBtn')
+        };
+
+        let W = 0, H = 0;
+        let vertices = [];
+        let draggedIndex = -1;
+        let hoverIndex = -1;
+        let score = 0;
+        let lives = 3;
+        let currentLevel = 1;
+        let isGameOver = false;
+        let pendingNextLevel = false;
+        let shapeAnalysis = { simple: true, convex: true, reflexVertices: [] };
+        let time = 0;
+        let lastTap = 0;
+
+        // 12 Levels Configuration
+        const levels = [
+            { sides: 4, concave: false, name: 'Convex Quadrilateral', hint: '4 sides, no dents', start: 3 },
+            { sides: 5, concave: false, name: 'Convex Pentagon',     hint: '5 sides, no dents', start: 4 },
+            { sides: 4, concave: true,  name: 'Concave Quadrilateral',hint: '4 sides, one inward dent', start: 4 },
+            { sides: 6, concave: false, name: 'Convex Hexagon',      hint: '6 sides, no dents', start: 5 },
+            { sides: 5, concave: true,  name: 'Concave Pentagon',     hint: '5 sides, one inward dent', start: 5 },
+            { sides: 6, concave: true,  name: 'Concave Hexagon',     hint: '6 sides, one inward dent', start: 6 },
+            { sides: 7, concave: false, name: 'Convex Heptagon',     hint: '7 sides, no dents', start: 6 },
+            { sides: 7, concave: true,  name: 'Concave Heptagon',     hint: '7 sides, one inward dent', start: 7 },
+            { sides: 8, concave: false, name: 'Convex Octagon',      hint: '8 sides, no dents', start: 7 },
+            { sides: 8, concave: true,  name: 'Concave Octagon',     hint: '8 sides, one inward dent', start: 8 },
+            { sides: 9, concave: false, name: 'Convex Nonagon',      hint: '9 sides, no dents', start: 8 },
+            { sides: 9, concave: true,  name: 'Concave Nonagon',     hint: '9 sides, one inward dent', start: 9 }
+        ];
+
+        // ========== GEOMETRY ENGINE ==========
+        function cross2D(ox, oy, ax, ay, bx, by) {
+            return (ax - ox) * (by - oy) - (ay - oy) * (bx - ox);
+        }
+
+        function segIntersect(p1, p2, p3, p4) {
+            const d1 = cross2D(p3.x, p3.y, p4.x, p4.y, p1.x, p1.y);
+            const d2 = cross2D(p3.x, p3.y, p4.x, p4.y, p2.x, p2.y);
+            const d3 = cross2D(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+            const d4 = cross2D(p1.x, p1.y, p2.x, p2.y, p4.x, p4.y);
+            return ((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) &&
+                   ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0));
+        }
+
+        function isSimple(verts) {
+            const n = verts.length;
+            if (n < 3) return false;
+            for (let i = 0; i < n; i++) {
+                const a1 = verts[i], a2 = verts[(i + 1) % n];
+                for (let j = i + 1; j < n; j++) {
+                    const b1 = verts[j], b2 = verts[(j + 1) % n];
+                    if ((i + 1) % n === j || (j + 1) % n === i) continue;
+                    if (segIntersect(a1, a2, b1, b2)) return false;
+                }
+            }
+            return true;
+        }
+
+        function analyze(verts) {
+            const n = verts.length;
+            if (n < 3) return { simple: false, convex: false, reflexVertices: [] };
+
+            const simple = isSimple(verts);
+            if (!simple) return { simple: false, convex: false, reflexVertices: [] };
+
+            let area = 0;
+            for (let i = 0; i < n; i++) {
+                const p1 = verts[i], p2 = verts[(i + 1) % n];
+                area += p1.x * p2.y - p2.x * p1.y;
+            }
+
+            const crosses = new Array(n);
+            for (let i = 0; i < n; i++) {
+                const prev = verts[(i - 1 + n) % n];
+                const curr = verts[i];
+                const next = verts[(i + 1) % n];
+                crosses[i] = (curr.x - prev.x) * (next.y - curr.y) - (curr.y - prev.y) * (next.x - curr.x);
+            }
+
+            let expectedSign;
+            if (Math.abs(area) > 1) {
+                expectedSign = area > 0 ? 1 : -1;
+            } else {
+                let pos = 0, neg = 0;
+                for (const c of crosses) {
+                    if (c > 0.5) pos++;
+                    else if (c < -0.5) neg++;
+                }
+                expectedSign = pos >= neg ? 1 : -1;
+            }
+
+            const reflex = [];
+            for (let i = 0; i < n; i++) {
+                if (crosses[i] * expectedSign < -0.5) {
+                    reflex.push(i);
+                }
+            }
+
+            return { simple: true, convex: reflex.length === 0, reflexVertices: reflex };
+        }
+
+        // ========== GAME LOGIC ==========
+        function initGame() {
+            score = 0;
+            lives = 3;
+            currentLevel = 1;
+            isGameOver = false;
+            pendingNextLevel = false;
+            updateUI();
+            initLevel();
+        }
+
+        function initLevel() {
+            const lvl = levels[currentLevel - 1];
+            el.objectiveText.textContent = `Level ${currentLevel}: Create a ${lvl.name}`;
+            el.targetDisplay.textContent = lvl.name;
+            el.missionHint.textContent = lvl.hint;
+            el.shapeTypeBadge.textContent = lvl.concave ? 'Concave' : 'Convex';
+            el.shapeTypeBadge.className = (lvl.concave ? 'irrational-badge' : 'integer-badge') + ' number-type-badge';
+            el.levelFocus.textContent = `Level ${currentLevel}: ${lvl.name}`;
+            initShape(lvl.start);
+        }
+
+        function initShape(sides) {
+            vertices = [];
+            const radius = Math.min(W, H) * 0.25;
+            const cx = W / 2;
+            const cy = H / 2;
+            for (let i = 0; i < sides; i++) {
+                const angle = (i * 2 * Math.PI) / sides - Math.PI / 2;
+                vertices.push({
+                    x: cx + radius * Math.cos(angle),
+                    y: cy + radius * Math.sin(angle)
+                });
+            }
+        }
+
+        function submitShape() {
+            if (pendingNextLevel) return;
+            const lvl = levels[currentLevel - 1];
+            const result = analyze(vertices);
+
+            if (!result.simple) {
+                loseLife("Complex Polygon", "Edges are crossing! A simple polygon cannot intersect itself.");
+                return;
+            }
+            if (vertices.length !== lvl.sides) {
+                loseLife("Wrong Side Count", `A ${lvl.name} needs ${lvl.sides} sides. You have ${vertices.length}.`);
+                return;
+            }
+            if (lvl.concave && result.convex) {
+                loseLife("Too Convex", `A ${lvl.name} needs at least one inward dent. Drag a vertex inside.`);
+                return;
+            }
+            if (!lvl.concave && !result.convex) {
+                loseLife("Too Concave", `A ${lvl.name} must be convex. Pull the inward dent outward.`);
+                return;
+            }
+
+            // Success
+            score += 100;
+            pendingNextLevel = true;
+            isGameOver = false;
+            showFeedback("Perfect Shape!", `+100 points! You mastered the ${lvl.name}.`, "✅");
+            updateUI();
+        }
+
+        function loseLife(title, msg) {
+            lives--;
+            updateUI();
+            pendingNextLevel = true;
+            isGameOver = lives <= 0;
+            showFeedback(title, msg + (lives > 0 ? ` (Lives remaining: ${lives})` : ""), "❌");
+        }
+
+        function showFeedback(title, message, icon = "✅") {
+            el.feedbackIcon.textContent = icon;
+            el.feedbackTitle.textContent = title;
+            el.feedbackMessage.textContent = message;
+            el.feedbackOverlay.classList.add('show');
+        }
+
+        function showCompletion() {
+            el.finalScore.textContent = score;
+            el.finalLevel.textContent = currentLevel;
+            if (isGameOver) {
+                el.completionTitle.textContent = "Game Over!";
+                el.completionMessage.textContent = "You ran out of lives. Study the shapes and try again!";
+            } else {
+                el.completionTitle.textContent = "Geometry Master!";
+                el.completionMessage.textContent = `You mastered all ${levels.length} levels of polygon geometry!`;
+            }
+            el.completionOverlay.classList.add('show');
+        }
+
+        function updateUI() {
+            el.score.textContent = score;
+            el.level.textContent = `${currentLevel}/${levels.length}`;
+            el.lives.textContent = lives;
+            el.progressBar.style.width = `${((currentLevel - 1) / levels.length) * 100}%`;
+        }
+
+        // ========== RENDERING ==========
+        function draw() {
+            ctx.fillStyle = '#020617';
+            ctx.fillRect(0, 0, W, H);
+            
+            // Grid
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+            ctx.lineWidth = 1;
+            for(let x=0; x<W; x+=30) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+            for(let y=0; y<H; y+=30) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+
+            if (vertices.length < 3) return;
+
+            shapeAnalysis = analyze(vertices);
+
+            let color, glowR, glowG, glowB;
+            if (!shapeAnalysis.simple) {
+                color = '#F1C40F'; glowR = 241; glowG = 196; glowB = 15;
+            } else if (shapeAnalysis.convex) {
+                color = '#27AE60'; glowR = 39; glowG = 174; glowB = 96;
+            } else {
+                color = '#E74C3C'; glowR = 231; glowG = 76; glowB = 60;
+            }
+
+            let cx = 0, cy = 0;
+            for (const v of vertices) { cx += v.x; cy += v.y; }
+            cx /= vertices.length; cy /= vertices.length;
+
+            ctx.beginPath();
+            ctx.moveTo(vertices[0].x, vertices[0].y);
+            for (let i = 1; i < vertices.length; i++) ctx.lineTo(vertices[i].x, vertices[i].y);
+            ctx.closePath();
+
+            const maxR = Math.max(W, H) * 0.4;
+            const fillGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR);
+            fillGrad.addColorStop(0, `rgba(${glowR},${glowG},${glowB},0.25)`);
+            fillGrad.addColorStop(0.5, `rgba(${glowR},${glowG},${glowB},0.1)`);
+            fillGrad.addColorStop(1, `rgba(${glowR},${glowG},${glowB},0)`);
+            ctx.fillStyle = fillGrad;
+            ctx.fill();
+
+            ctx.shadowColor = color;
+            ctx.shadowBlur = 15;
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            ctx.lineJoin = 'round';
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            for (let i = 0; i < vertices.length; i++) {
+                const v = vertices[i];
+                const isReflex = shapeAnalysis.reflexVertices.includes(i);
+                const isDragged = i === draggedIndex;
+                const isHovered = i === hoverIndex;
+                const baseR = isDragged ? 10 : (isHovered ? 8 : 7);
+
+                if (isReflex) {
+                    const ringR = 14 + Math.sin(time * 0.005) * 2;
+                    ctx.beginPath();
+                    ctx.arc(v.x, v.y, ringR, 0, Math.PI * 2);
+                    ctx.strokeStyle = `rgba(231, 76, 60, 0.7)`;
+                    ctx.lineWidth = 1.5;
+                    ctx.setLineDash([4, 3]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+
+                ctx.shadowColor = isReflex ? '#E74C3C' : color;
+                ctx.shadowBlur = 10;
+
+                ctx.beginPath();
+                ctx.arc(v.x, v.y, baseR, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+
+                ctx.shadowBlur = 0;
+
+                ctx.beginPath();
+                ctx.arc(v.x, v.y, baseR * 0.5, 0, Math.PI * 2);
+                ctx.fillStyle = isReflex ? '#E74C3C' : color;
+                ctx.fill();
+            }
+        }
+
+        function gameLoop() {
+            time = performance.now();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // ========== INPUT & RESIZE ==========
+        function getPos(e) {
+            const r = canvas.getBoundingClientRect();
+            const t = e.touches ? e.touches[0] : e;
+            return { x: t.clientX - r.left, y: t.clientY - r.top };
+        }
+
+        function findVertex(pos, radius = 32) {
+            for (let i = vertices.length - 1; i >= 0; i--) {
+                if (Math.hypot(vertices[i].x - pos.x, vertices[i].y - pos.y) < radius) return i;
+            }
+            return -1;
+        }
+
+        function startDrag(e) {
+            const pos = getPos(e);
+            const idx = findVertex(pos);
+            if (idx !== -1) {
+                // Double tap logic for mobile removal
+                const now = Date.now();
+                if (now - lastTap < 300 && vertices.length > 3) {
+                    vertices.splice(idx, 1);
+                    draggedIndex = -1;
+                } else {
+                    draggedIndex = idx;
+                }
+                lastTap = now;
+                e.preventDefault();
+            }
+        }
+
+        function moveDrag(e) {
+            const pos = getPos(e);
+            if (draggedIndex !== -1) {
+                vertices[draggedIndex].x = pos.x;
+                vertices[draggedIndex].y = pos.y;
+                e.preventDefault();
+            } else {
+                hoverIndex = findVertex(pos, 28);
+                canvas.style.cursor = hoverIndex !== -1 ? 'grab' : 'default';
+            }
+        }
+
+        function endDrag() {
+            if (draggedIndex !== -1) {
+                draggedIndex = -1;
+                canvas.style.cursor = 'default';
+            }
+        }
+
+        canvas.addEventListener('mousedown', startDrag);
+        window.addEventListener('mousemove', moveDrag);
+        window.addEventListener('mouseup', endDrag);
+        canvas.addEventListener('touchstart', startDrag, { passive: false });
+        window.addEventListener('touchmove', moveDrag, { passive: false });
+        window.addEventListener('touchend', endDrag);
+
+        canvas.addEventListener('dblclick', (e) => {
+            if (vertices.length <= 3) return;
+            const pos = getPos(e);
+            const idx = findVertex(pos, 28);
+            if (idx !== -1) vertices.splice(idx, 1);
+        });
+
+        function resize() {
+            const oldW = W, oldH = H;
+            const container = canvas.parentElement;
+            W = container.clientWidth;
+            H = container.clientHeight;
+            canvas.width = W;
+            canvas.height = H;
+            
+            if (oldW > 0 && oldH > 0 && vertices.length > 0) {
+                const sx = W / oldW, sy = H / oldH;
+                vertices.forEach(v => { v.x *= sx; v.y *= sy; });
+            }
+        }
+        window.addEventListener('resize', resize);
+
+        // ========== EVENT LISTENERS ==========
+        el.submitBtn.addEventListener('click', submitShape);
+        
+        el.resetBtn.addEventListener('click', () => {
+            initShape(levels[currentLevel - 1].start);
+        });
+
+        el.addVertexBtn.addEventListener('click', () => {
+            if (vertices.length >= 12) return;
+            let maxLen = 0, maxIdx = 0;
+            for (let i = 0; i < vertices.length; i++) {
+                const a = vertices[i], b = vertices[(i + 1) % vertices.length];
+                const len = Math.hypot(b.x - a.x, b.y - a.y);
+                if (len > maxLen) { maxLen = len; maxIdx = i; }
+            }
+            const a = vertices[maxIdx], b = vertices[(maxIdx + 1) % vertices.length];
+            let cx = 0, cy = 0;
+            for (const v of vertices) { cx += v.x; cy += v.y; }
+            cx /= vertices.length; cy /= vertices.length;
+            const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+            const dx = mx - cx, dy = my - cy;
+            const dist = Math.hypot(dx, dy) || 1;
+            const offset = 20;
+            vertices.splice(maxIdx + 1, 0, {
+                x: mx + (dx / dist) * offset,
+                y: my + (dy / dist) * offset
+            });
+        });
+
+        el.openLessonBtn.addEventListener('click', () => el.lessonOverlay.classList.add('show'));
+        el.closeLesson.addEventListener('click', () => el.lessonOverlay.classList.remove('show'));
+        el.closeLessonBtn.addEventListener('click', () => el.lessonOverlay.classList.remove('show'));
+
+        el.nextBtn.addEventListener('click', () => {
+            el.feedbackOverlay.classList.remove('show');
+            if (pendingNextLevel) {
+                pendingNextLevel = false;
+                if (isGameOver) {
+                    showCompletion();
+                } else {
+                    currentLevel++;
+                    if (currentLevel > levels.length) {
+                        showCompletion();
+                    } else {
+                        initLevel();
+                        updateUI();
+                    }
+                }
+            }
+        });
+
+        el.playAgainBtn.addEventListener('click', () => {
+            el.completionOverlay.classList.remove('show');
+            initGame();
+        });
+
+        el.homeBtn.addEventListener('click', () => { window.location.href = 'index.html'; });
+        el.backBtn.addEventListener('click', () => { window.location.href = 'index.html'; });
+
+        // ========== INITIALIZATION ==========
+        resize();
+        initGame();
+        gameLoop();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Ninja: Dojo Master | MathPlay Ethiopia</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- EXACTLY FROM VENN DIAGRAM GAME --- */
+        :root {
+            --primary: #2C3E50;
+            --secondary: #E74C3C;
+            --accent: #3498DB;
+            --light: #F8F9FA;
+            --dark: #2C3E50;
+            --yellow: #F1C40F;
+            --green: #27AE60;
+            --purple: #9B59B6;
+            --orange: #E67E22;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius: 12px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        html, body {
+            min-height: 100%;
+            overflow: auto;
+            position: relative;
+            width: 100%;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        /* --- Game Container --- */
+        .game-container {
+            min-height: 100vh;
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+
+        /* --- Header --- */
+        .game-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 10px 12px 8px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,.1);
+        }
+        
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        
+        .back-btn {
+            background: rgba(255,255,255,.2);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            box-shadow: 0 0 15px rgba(255,255,255,.3);
+        }
+        
+        .back-btn:hover {
+            background: rgba(255,255,255,.3);
+            box-shadow: 0 0 20px rgba(255,255,255,.5);
+            transform: scale(1.1);
+        }
+        
+        .back-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .game-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-align: center;
+            flex: 1;
+            padding: 0 6px;
+        }
+        
+        .score-panel {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            justify-content: center;
+        }
+        
+        .score-item {
+            background: rgba(255,255,255,.2);
+            border-radius: 8px;
+            padding: 5px 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            font-size: .75rem;
+        }
+        
+        .score-item .value {
+            background: white;
+            color: var(--primary);
+            padding: 1px 6px;
+            border-radius: 10px;
+            min-width: 25px;
+            text-align: center;
+            font-size: .8rem;
+        }
+        
+        .objective-panel {
+            background: rgba(255,255,255,.95);
+            border-radius: 6px;
+            padding: 8px 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.1);
+            border-left: 3px solid var(--accent);
+            margin-bottom: 6px;
+        }
+        
+        .objective-text {
+            color: var(--dark);
+            font-size: .75rem;
+            line-height: 1.3;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .progress-container {
+            background: rgba(255,255,255,.2);
+            border-radius: 6px;
+            height: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, var(--accent), var(--green));
+            height: 100%;
+            width: 25%;
+            transition: width .3s ease;
+        }
+
+        /* --- Game Content --- */
+        .game-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            gap: 6px;
+        }
+
+        /* --- Action Buttons --- */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+        
+        .action-btn {
+            padding: 12px;
+            border-radius: var(--radius);
+            border: none;
+            font-weight: 700;
+            font-size: .8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        
+        .check-btn {
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            color: white;
+        }
+        
+        .check-btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+        
+        .reset-btn {
+            background: var(--light);
+            color: var(--dark);
+            border: 2px solid var(--accent);
+        }
+        
+        .lesson-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+        }
+
+        /* --- Ad Container --- */
+        .ad-container {
+            background: white;
+            border-radius: 8px;
+            padding: 6px;
+            margin-top: 6px;
+            border: 1px solid rgba(0,0,0,.1);
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,.05);
+            flex-shrink: 0;
+        }
+        
+        .ad-label {
+            font-size: .65rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+        
+        .ad-content {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 6px;
+            padding: 12px 8px;
+            color: #666;
+            font-size: .7rem;
+            border: 1px dashed #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        /* --- Overlays --- */
+        .lesson-overlay, .feedback-overlay, .completion-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all .3s ease;
+        }
+        
+        .lesson-overlay.show, .feedback-overlay.show, .completion-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .lesson-card, .feedback-card, .completion-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            max-width: 350px;
+            width: 90%;
+            box-shadow: 0 15px 30px rgba(0,0,0,.3);
+        }
+        
+        .lesson-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        
+        .lesson-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .close-lesson {
+            background: rgba(52,152,219,.1);
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            color: var(--accent);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .lesson-content {
+            color: var(--dark);
+            line-height: 1.4;
+            font-size: .85rem;
+            margin-bottom: 15px;
+        }
+        
+        .lesson-example {
+            background: rgba(52,152,219,.1);
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 12px;
+            font-size: .8rem;
+        }
+        
+        .lesson-btn {
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-weight: 700;
+            font-size: .85rem;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin-top: 8px;
+        }
+        
+        .feedback-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+        }
+        
+        .feedback-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+        
+        .feedback-message {
+            color: var(--dark);
+            margin-bottom: 15px;
+            line-height: 1.4;
+            font-size: .85rem;
+        }
+        
+        .feedback-btn {
+            background: linear-gradient(135deg, var(--secondary), var(--orange));
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: var(--radius);
+            font-weight: 700;
+            font-size: .9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+        }
+        
+        .completion-card {
+            text-align: center;
+        }
+        
+        .completion-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        
+        .completion-subtitle {
+            font-size: 1.1rem;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+        
+        .completion-message {
+            color: var(--dark);
+            margin-bottom: 20px;
+            line-height: 1.4;
+            font-size: .9rem;
+        }
+        
+        .completion-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .completion-btn {
+            padding: 12px;
+            border-radius: var(--radius);
+            border: none;
+            font-weight: 700;
+            font-size: .85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        
+        .play-again-btn {
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            color: white;
+        }
+        
+        .home-btn {
+            background: var(--light);
+            color: var(--dark);
+            border: 2px solid var(--accent);
+        }
+
+        /* --- Micro-lesson Bar --- */
+        .operations-bar {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: var(--radius);
+            padding: 10px;
+            color: white;
+            box-shadow: var(--shadow);
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+        
+        .operations-bar > div {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .operations-bar .title {
+            font-size: .75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* --- Animations --- */
+        @keyframes bounceIn {
+            0% { transform: scale(.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .bounce-in { animation: bounceIn .3s ease; }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .shake { animation: shake .5s ease; }
+
+        /* --- Utility Classes --- */
+        .seo-content {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+
+        /* --- Responsive --- */
+        @media (max-height: 600px) {
+            .target-elements { max-height: none; }
+        }
+        
+        @media (max-width: 380px) {
+            .game-title { font-size: 1rem; }
+            .score-panel { gap: 4px; }
+            .score-item { padding: 4px 6px; font-size: .7rem; }
+        }
+
+        /* --- GAME-SPECIFIC STYLES FOR NINJA GAME --- */
+        /* We'll use the exact Ninja game mechanics but with Venn UI styling */
+        
+        /* Dojo container styling to fit within Venn UI */
+        #dojo {
+            position: relative;
+            width: 100%;
+            flex: 1;
+            background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
+            border-radius: var(--radius);
+            overflow: hidden;
+            touch-action: none;
+            border: 3px solid #e2e8f0;
+            box-shadow: var(--shadow);
+            margin-top: 10px;
+            min-height: 400px;
+            transition: box-shadow 0.2s ease;
+        }
+
+        /* Red flicker glow */
+        @keyframes redFlicker {
+            0%, 100% { box-shadow: 0 0 0 rgba(231, 76, 60, 0); }
+            25% { box-shadow: 0 0 25px rgba(231, 76, 60, 0.9), 0 0 50px rgba(231, 76, 60, 0.7); }
+            50% { box-shadow: 0 0 0 rgba(231, 76, 60, 0); }
+            75% { box-shadow: 0 0 25px rgba(231, 76, 60, 0.9), 0 0 50px rgba(231, 76, 60, 0.7); }
+        }
+
+        .wrong-slice-glow {
+            animation: redFlicker 0.4s ease 2;
+        }
+
+        #slice-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 5;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .number-wrapper {
+            position: absolute;
+            pointer-events: auto;
+            will-change: transform;
+            z-index: 2;
+            cursor: pointer;
+        }
+        
+        .number-content {
+            font-size: 2.8rem;
+            font-weight: 900;
+            text-shadow: 4px 4px 0px #000;
+            padding: 15px;
+            color: white;
+            text-align: center;
+            user-select: none;
+            font-family: monospace;
+            transition: transform 0.1s ease;
+        }
+        
+        .number-wrapper:hover .number-content {
+            transform: scale(1.05);
+        }
+        
+        /* Correct/Wrong pieces - using Venn colors */
+        .half {
+            position: absolute;
+            white-space: nowrap;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s;
+            font-weight: 900;
+            font-family: monospace;
+            font-size: 2.5rem;
+        }
+        
+        .correct-piece {
+            color: var(--green);  /* Using Venn green for correct */
+            text-shadow: 0 0 20px var(--green), 0 0 40px rgba(39, 174, 96, 0.5);
+        }
+        
+        .wrong-piece {
+            color: var(--secondary);  /* Using Venn red for wrong */
+            text-shadow: 0 0 20px var(--secondary), 0 0 40px rgba(231, 76, 60, 0.5);
+        }
+
+        /* Score styling - using Venn colors */
+        #scoreGame.value {
+            color: var(--green);
+            font-weight: 800;
+        }
+        
+        #goalGame.value {
+            color: var(--accent);
+            font-weight: 800;
+        }
+
+        /* Updated overlay to match Venn styling but with Ninja content */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.97);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        
+        .modal-content {
+            width: 88%;
+            max-width: 420px;
+            background: white;  /* Venn uses white background */
+            border: 3px solid var(--accent);  /* Venn accent color */
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .modal-content h2 {
+            color: var(--primary);  /* Venn primary color */
+            margin-top: 0;
+            font-size: 1.4rem;
+        }
+        
+        .modal-content p {
+            text-align: left;
+            line-height: 1.5;
+            font-size: 1rem;
+            color: var(--dark);  /* Venn dark color */
+            margin-bottom: 10px;
+        }
+        
+        .modal-content .examples {
+            color: var(--accent);  /* Venn accent color */
+            font-family: monospace;
+            font-weight: bold;
+            background: rgba(52,152,219,.1);  /* Light accent background */
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 5px solid var(--accent);  /* Venn accent color */
+            white-space: pre-wrap;
+        }
+        
+        .modal-content button { 
+            background: linear-gradient(135deg, var(--accent), var(--purple));  /* Venn gradient */
+            border: none;
+            padding: 15px 45px;
+            font-weight: 700;  /* Venn font weight */
+            border-radius: var(--radius);  /* Venn radius */
+            font-size: 1.1rem;
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);  /* Venn transition */
+            width: 100%;
+        }
+        
+        .modal-content button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
+        /* Game stats styling */
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            max-width: 450px;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        
+        #target-type {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--yellow);  /* Venn yellow */
+            margin: 2px 0;
+            text-shadow: 0 0 15px rgba(241, 196, 15, 0.4);
+            text-align: center;
+        }
+        
+        #score-val {
+            color: var(--green);  /* Venn green */
+        }
+    </style>
+</head>
+<body>
+    <!-- Game Container -->
+    <div id="game-container" class="game-container">
+        <header class="game-header">
+            <div class="header-top">
+                <button class="back-btn" id="backBtnGame" aria-label="Go back"><i class="fas fa-arrow-left"></i></button>
+                <h1 class="game-title" id="gameTitle">Number Ninja: Dojo Master</h1>
+                <div style="width:44px"></div>
+            </div>
+            
+            <div id="level-indicator" style="text-align: center; color: var(--accent); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">
+                CHAPTER 2: REAL NUMBERS
+            </div>
+            
+            <div class="objective-panel">
+                <p class="objective-text" id="target-type">GET READY</p>
+            </div>
+            
+            <div class="score-panel">
+                <div class="score-item">
+                    <i class="fas fa-star" style="color:var(--yellow)"></i>
+                    <span>SCORE:</span>
+                    <span class="value" id="score-val">0</span>
+                </div>
+                <div class="score-item">
+                    <i class="fas fa-trophy" style="color:var(--green)"></i>
+                    <span>GOAL:</span>
+                    <span class="value" id="goal-val">0/20</span>
+                </div>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBarGame"></div>
+            </div>
+        </header>
+
+        <main class="game-content">
+            <!-- Game Area -->
+            <div id="dojo">
+                <canvas id="slice-canvas"></canvas>
+            </div>
+
+            <!-- Micro-lesson Bar -->
+            <div class="operations-bar">
+                <div>
+                    <div class="title"><i class="fas fa-graduation-cap"></i><span>Number Types Lesson</span></div>
+                    <button class="action-btn lesson-btn" id="btn-lesson">📜 PAUSE & LEARN</button>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="action-btn reset-btn" id="resetBtn">
+                    <i class="fas fa-redo"></i>Restart Level
+                </button>
+                <button class="action-btn lesson-btn" style="display: none;" id="nextLevelBtn">
+                    <i class="fas fa-arrow-right"></i>Next Level
+                </button>
+            </div>
+
+            <!-- Ad Container -->
+            <div class="ad-container" aria-label="Advertisement">
+                <div class="ad-label">Sponsored</div>
+                <div class="ad-content"><div class="ad-placeholder">Ad Space</div></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Lesson Overlay -->
+    <div class="lesson-overlay" id="modal-overlay">
+        <div class="lesson-card">
+            <div class="lesson-header">
+                <h2 class="lesson-title" id="modal-title"><i class="fas fa-graduation-cap"></i>MISSION BRIEFING</h2>
+                <button class="close-lesson" id="closeLesson"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="lesson-content" id="modal-body"></div>
+            <div class="lesson-example" id="modal-examples"></div>
+            <button class="lesson-btn" id="modal-btn">I'M READY</button>
+        </div>
+    </div>
+
+    <!-- Completion Overlay -->
+    <div class="completion-overlay" id="completionOverlay">
+        <div class="completion-card">
+            <div style="font-size:3rem;margin-bottom:12px">🎉</div>
+            <h2 class="completion-title" id="completionTitle">DOJO MASTER!</h2>
+            <div class="completion-subtitle">Final Score: <span id="finalScore">0</span></div>
+            <p class="completion-message" id="completionMessage">Mastery Achieved!</p>
+            <div class="completion-buttons">
+                <button class="completion-btn play-again-btn" id="playAgainBtn">
+                    <i class="fas fa-redo"></i>Play Again
+                </button>
+                <button class="completion-btn home-btn" id="homeBtn">
+                    <i class="fas fa-home"></i>Exit Game
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===========================
+        // EXACT GAME LOGIC FROM NINJA GAME - WITH SMOOTHER CURVE
+        // ===========================
+        const levels = [
+            { 
+                name: 'Natural', 
+                title: 'Level 1: Natural Numbers (ℕ)', 
+                lesson: 'Counting numbers. Must be positive and whole.',
+                examples: 'ℕ = {1, 2, 3, 4, ...}\nNote: 0 is NOT natural.',
+                pool: ["1", "5", "12", "7", "25", "9"],
+                wrong: ["-4", "0.5", "π", "0", "1/2"]
+            },
+            { 
+                name: 'Integer', 
+                title: 'Level 2: Integers (ℤ)', 
+                lesson: 'Includes naturals, their negatives, and zero. No decimals!',
+                examples: 'ℤ = {..., -2, -1, 0, 1, 2, ...}',
+                pool: ["-15", "0", "50", "-3", "20", "-1", "-42"],
+                wrong: ["0.75", "1/2", "√2", "2.1", "0.33..."]
+            },
+            { 
+                name: 'Rational', 
+                title: 'Level 3: Rational Numbers (ℚ)', 
+                lesson: 'Numbers that can be fractions. Includes terminating and repeating decimals.',
+                examples: 'ℚ = {1/2, 0.75, 0.33..., -4, 0, 5}',
+                pool: ["3/4", "0.25", "0.33...", "5.5", "-1/2", "0.6"],
+                wrong: ["π", "√2", "√7", "1.414...", "e"]
+            },
+            { 
+                name: 'Irrational', 
+                title: 'Level 4: Irrational Numbers', 
+                lesson: 'Numbers that never end and never repeat. Cannot be written as fractions.',
+                examples: 'π, √2, √3, e, 1.618..., √11',
+                pool: ["π", "√2", "√5", "e", "√11", "√13"],
+                wrong: ["3/4", "0.5", "10", "0.33...", "-2"]
+            }
+        ];
+
+        let currentIdx = 0;
+        let score = 0;
+        let gameActive = false;
+        let correctInLevel = 0;
+        let spawnInterval;
+        const targetToWin = 20;
+
+        const dojo = document.getElementById('dojo');
+        const canvas = document.getElementById('slice-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = dojo.offsetWidth;
+            canvas.height = dojo.offsetHeight;
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+
+        function showLevelBriefing() {
+            gameActive = false;
+            clearInterval(spawnInterval);
+            const level = levels[currentIdx];
+            document.getElementById('modal-title').innerText = level.title;
+            document.getElementById('modal-body').innerText = level.lesson;
+            document.getElementById('modal-examples').innerText = "Examples:\n" + level.examples;
+            document.getElementById('modal-btn').innerText = "START LEVEL";
+            document.getElementById('modal-overlay').classList.add('show');
+        }
+
+        function showPauseLesson() {
+            if (!gameActive && document.getElementById('modal-overlay').classList.contains('show')) return;
+            gameActive = false;
+            clearInterval(spawnInterval);
+            const level = levels[currentIdx];
+            document.getElementById('modal-title').innerText = "PAUSED: " + level.name;
+            document.getElementById('modal-body').innerText = level.lesson;
+            document.getElementById('modal-examples').innerText = "Reference:\n" + level.examples;
+            document.getElementById('modal-btn').innerText = "RESUME";
+            document.getElementById('modal-overlay').classList.add('show');
+        }
+
+        function handleModalAction() {
+            const btnText = document.getElementById('modal-btn').innerText;
+            document.getElementById('modal-overlay').classList.remove('show');
+
+            if (btnText === "PLAY AGAIN") {
+                location.reload();
+            } else if (btnText === "START NEXT LEVEL") {
+                showLevelBriefing();
+            } else {
+                gameActive = true;
+                if (btnText === "START LEVEL") {
+                    correctInLevel = 0;
+                    document.getElementById('goal-val').innerText = `0/${targetToWin}`;
+                    document.getElementById('level-indicator').innerText = `LEVEL ${currentIdx + 1}`;
+                    document.getElementById('target-type').innerText = levels[currentIdx].name.toUpperCase();
+                    document.getElementById('progressBarGame').style.width = '0%';
+                }
+                resetSpawnTimer();
+            }
+        }
+
+        function handleCloseButton() {
+            const btnText = document.getElementById('modal-btn').innerText;
+            const isCompletionOverlay = document.getElementById('completionOverlay').classList.contains('show');
+            
+            if (isCompletionOverlay) {
+                // Do nothing - no X button on final overlay
+                return;
+            }
+            
+            document.getElementById('modal-overlay').classList.remove('show');
+            
+            if (btnText === "START LEVEL" || btnText === "START NEXT LEVEL") {
+                // Start the game
+                gameActive = true;
+                correctInLevel = 0;
+                document.getElementById('goal-val').innerText = `0/${targetToWin}`;
+                document.getElementById('level-indicator').innerText = `LEVEL ${currentIdx + 1}`;
+                document.getElementById('target-type').innerText = levels[currentIdx].name.toUpperCase();
+                document.getElementById('progressBarGame').style.width = '0%';
+                resetSpawnTimer();
+            } else if (btnText === "RESUME") {
+                // Resume paused game
+                gameActive = true;
+                resetSpawnTimer();
+            }
+        }
+
+        function resetSpawnTimer() {
+            clearInterval(spawnInterval);
+            spawnInterval = setInterval(spawn, 1200);
+        }
+
+        function spawn() {
+            if (!gameActive) return;
+            const level = levels[currentIdx];
+            const isTarget = Math.random() < 0.5;
+            const val = isTarget ? 
+                level.pool[Math.floor(Math.random()*level.pool.length)] : 
+                level.wrong[Math.floor(Math.random()*level.wrong.length)];
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'number-wrapper';
+            wrapper.innerHTML = `<div class="number-content">${val}</div>`;
+            wrapper.dataset.isCorrect = isTarget;
+            wrapper.dataset.sliced = "false";
+            dojo.appendChild(wrapper);
+
+            // smoother, curvier trajectory
+            let x = Math.random() > 0.5 ? 40 : dojo.offsetWidth - 110;
+            let y = dojo.offsetHeight - 50;
+
+            let vX = (dojo.offsetWidth / 2 - x) / 120;
+            let vY = -10;
+            let gravity = 0.25;
+
+            function animate() {
+                if (!wrapper.parentElement) return;
+                if (gameActive) {
+                    vY += gravity; 
+                    x += vX; 
+                    y += vY;
+                    wrapper.style.transform = `translate(${x}px, ${y}px)`;
+                }
+                
+                if (y > dojo.offsetHeight + 50) {
+                    wrapper.remove();
+                } else {
+                    requestAnimationFrame(animate);
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        function handleSlice(el) {
+            if (el.dataset.sliced === "true" || !gameActive) return;
+            el.dataset.sliced = "true";
+            const isCorrect = el.dataset.isCorrect === "true";
+            const val = el.querySelector('.number-content').textContent;
+            el.innerHTML = '';
+            
+            const h1 = document.createElement('div'); 
+            h1.className = `half ${isCorrect ? 'correct-piece' : 'wrong-piece'}`; 
+            h1.innerText = val;
+            h1.style.clipPath = 'inset(0 50% 0 0)';
+            
+            const h2 = document.createElement('div'); 
+            h2.className = `half ${isCorrect ? 'correct-piece' : 'wrong-piece'}`; 
+            h2.innerText = val;
+            h2.style.clipPath = 'inset(0 0 0 50%)';
+            
+            el.appendChild(h1); 
+            el.appendChild(h2);
+
+            requestAnimationFrame(() => {
+                h1.style.transform = 'translate(-70px, -60px) rotate(-45deg)';
+                h2.style.transform = 'translate(70px, 60px) rotate(45deg)';
+                h1.style.opacity = '0'; 
+                h2.style.opacity = '0';
+            });
+
+            if (isCorrect) {
+                score += 10;
+                correctInLevel++;
+                document.getElementById('score-val').innerText = score;
+                document.getElementById('goal-val').innerText = `${correctInLevel}/${targetToWin}`;
+                document.getElementById('progressBarGame').style.width = `${(correctInLevel / targetToWin) * 100}%`;
+                if (correctInLevel >= targetToWin) completeLevel();
+            } else {
+                score = Math.max(0, score - 5);
+                document.getElementById('score-val').innerText = score;
+                // RED FLICKER ON WRONG SLICE
+                dojo.classList.add('wrong-slice-glow');
+                setTimeout(() => dojo.classList.remove('wrong-slice-glow'), 800);
+            }
+            setTimeout(() => {
+                if (el.parentElement) {
+                    el.remove();
+                }
+            }, 600);
+        }
+
+        function completeLevel() {
+            gameActive = false;
+            clearInterval(spawnInterval);
+            currentIdx++;
+            const isLast = currentIdx >= levels.length;
+            
+            if (isLast) {
+                showCompletion();
+            } else {
+                document.getElementById('modal-title').innerText = "LEVEL COMPLETE!";
+                document.getElementById('modal-body').innerText = isLast ? "Mastery Achieved!" : "Definition mastered. Proceeding...";
+                document.getElementById('modal-examples').innerText = `Total Score: ${score}`;
+                document.getElementById('modal-btn').innerText = isLast ? "PLAY AGAIN" : "START NEXT LEVEL";
+                document.getElementById('modal-overlay').classList.add('show');
+            }
+        }
+
+        function showCompletion() {
+            document.getElementById('finalScore').innerText = score;
+            document.getElementById('completionTitle').innerText = "DOJO MASTER!";
+            document.getElementById('completionMessage').innerText = "Mastery Achieved!";
+            document.getElementById('completionOverlay').classList.add('show');
+        }
+
+        function resetGame() {
+            currentIdx = 0;
+            score = 0;
+            correctInLevel = 0;
+            gameActive = false;
+            document.getElementById('score-val').innerText = '0';
+            document.getElementById('goal-val').innerText = `0/${targetToWin}`;
+            document.getElementById('progressBarGame').style.width = '0%';
+            document.querySelectorAll('.number-wrapper').forEach(el => el.remove());
+            document.getElementById('completionOverlay').classList.remove('show');
+            showLevelBriefing();
+        }
+
+        // ANDROID HOME BUTTON FIX: Pause game when app is minimized
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden && gameActive) {
+                showPauseLesson();
+            }
+        });
+
+        let points = [];
+        dojo.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (!gameActive) return;
+            const t = e.touches[0];
+            const rect = dojo.getBoundingClientRect();
+            points.push({x: t.clientX - rect.left, y: t.clientY - rect.top, life: 1.0});
+            const hit = document.elementFromPoint(t.clientX, t.clientY);
+            if (hit && hit.closest('.number-wrapper')) {
+                handleSlice(hit.closest('.number-wrapper'));
+            }
+        }, {passive: false});
+
+        function drawTrail() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (points.length > 1) {
+                ctx.beginPath(); 
+                ctx.strokeStyle = '#fff'; 
+                ctx.lineWidth = 6; 
+                ctx.lineCap = 'round';
+                ctx.moveTo(points[0].x, points[0].y);
+                for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+                ctx.stroke();
+            }
+            for(let i = 0; i < points.length; i++) points[i].life -= 0.18; 
+            points = points.filter(p => p.life > 0);
+            requestAnimationFrame(drawTrail);
+        }
+
+        // Event Listeners
+        document.getElementById('btn-lesson').addEventListener('click', showPauseLesson);
+        document.getElementById('modal-btn').addEventListener('click', handleModalAction);
+        document.getElementById('closeLesson').addEventListener('click', handleCloseButton);
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            // Clear all numbers and restart level
+            document.querySelectorAll('.number-wrapper').forEach(el => el.remove());
+            correctInLevel = 0;
+            score = 0;
+            document.getElementById('score-val').innerText = '0';
+            document.getElementById('goal-val').innerText = `0/${targetToWin}`;
+            document.getElementById('progressBarGame').style.width = '0%';
+            gameActive = true;
+            resetSpawnTimer();
+        });
+        document.getElementById('playAgainBtn').addEventListener('click', resetGame);
+        document.getElementById('homeBtn').addEventListener('click', () => {
+            if (confirm("Exit game?")) {
+                // In a real app, this would go back to menu
+                // For now, just reload
+                location.reload();
+            }
+        });
+        
+        // Mouse events for desktop
+        dojo.addEventListener('mousedown', (e) => {
+            if (e.button !== 0) return;
+            const rect = dojo.getBoundingClientRect();
+            points.push({x: e.clientX - rect.left, y: e.clientY - rect.top, life: 1.0});
+            
+            const hit = document.elementFromPoint(e.clientX, e.clientY);
+            if (hit && hit.closest('.number-wrapper')) {
+                handleSlice(hit.closest('.number-wrapper'));
+            }
+        });
+        
+        dojo.addEventListener('mousemove', (e) => {
+            if (!gameActive || e.buttons !== 1) return;
+            
+            const rect = dojo.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            points.push({x, y, life: 1.0});
+            
+            const hit = document.elementFromPoint(e.clientX, e.clientY);
+            if (hit && hit.closest('.number-wrapper')) {
+                handleSlice(hit.closest('.number-wrapper'));
+            }
+        });
+
+        // Initialize
+        resizeCanvas();
+        drawTrail();
+        showLevelBriefing();
+    </script>
+</body>
+</html>

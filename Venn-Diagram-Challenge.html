@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venn Diagram Challenge | MathPlay Ethiopia</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- Base Styles --- */
+        :root {
+            --primary: #2C3E50;
+            --secondary: #E74C3C;
+            --accent: #3498DB;
+            --light: #F8F9FA;
+            --dark: #2C3E50;
+            --yellow: #F1C40F;
+            --gold: #fbbf24;
+            --green: #27AE60;
+            --purple: #9B59B6;
+            --orange: #E67E22;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: auto;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        /* --- Game Container --- */
+        .game-container {
+            min-height: 100vh;
+            min-height: 100dvh;
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+
+        /* --- Header --- */
+        .game-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 10px 12px 8px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,.2);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            box-shadow: 0 0 15px rgba(255,255,255,.3);
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,.3);
+            box-shadow: 0 0 20px rgba(255,255,255,.5);
+            transform: scale(1.1);
+        }
+
+        .back-btn:active { transform: scale(0.95); }
+
+        .game-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-align: center;
+            flex: 1;
+            padding: 0 6px;
+        }
+
+        .score-panel {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            justify-content: center;
+        }
+
+        .score-item {
+            background: rgba(255,255,255,.2);
+            border-radius: 8px;
+            padding: 5px 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            font-size: .75rem;
+        }
+
+        .score-item .value {
+            background: white;
+            color: var(--primary);
+            padding: 1px 6px;
+            border-radius: 10px;
+            min-width: 25px;
+            text-align: center;
+            font-size: .8rem;
+        }
+
+        .objective-panel {
+            background: rgba(255,255,255,.95);
+            border-radius: 6px;
+            padding: 8px 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.1);
+            border-left: 3px solid var(--accent);
+            margin-bottom: 6px;
+        }
+
+        .objective-text {
+            color: var(--dark);
+            font-size: .8rem;
+            line-height: 1.3;
+            font-weight: 600;
+        }
+
+        .progress-container {
+            background: rgba(255,255,255,.2);
+            border-radius: 6px;
+            height: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--accent), var(--green));
+            height: 100%;
+            width: 0;
+            transition: width .3s ease;
+        }
+
+        /* --- Level Selection Screen --- */
+        .level-selection {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .level-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+            border: 3px solid transparent;
+        }
+
+        .level-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+
+        .level-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+
+        .level-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .level-description {
+            color: var(--dark);
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+
+        .level-difficulty {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .easy { background: rgba(39, 174, 96, 0.1); color: var(--green); }
+        .medium { background: rgba(241, 196, 15, 0.1); color: #d35400; }
+
+        /* --- Game Content --- */
+        .game-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            gap: 6px;
+        }
+
+        /* --- Shared target / Venn section (both levels) --- */
+        .target-section {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            border-radius: var(--radius);
+            padding: 10px;
+            color: var(--primary);
+            box-shadow: var(--shadow);
+            flex-shrink: 0;
+            margin-top: 4px;
+        }
+
+        .target-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .target-name {
+            font-weight: 700;
+            font-size: .8rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .target-elements {
+            background: rgba(255,255,255,.92);
+            border-radius: 6px;
+            padding: 8px;
+            min-height: 50px;
+        }
+
+        .venn-svg {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .region {
+            fill: transparent;
+            stroke: none;
+            cursor: pointer;
+            transition: fill .25s;
+            pointer-events: all;
+        }
+
+        .region.glow { fill: rgba(255,215,0,.45); }
+
+        .outline {
+            fill: none;
+            stroke: var(--gold);
+            stroke-width: 3;
+            pointer-events: none;
+        }
+
+        .venn-label {
+            font-weight: 700;
+            font-size: 22px;
+            fill: var(--primary);
+            opacity: .55;
+            pointer-events: none;
+            text-anchor: middle;
+            user-select: none;
+        }
+
+        .venn-label.small { font-size: 14px; }
+
+        .expr-line {
+            text-align: center;
+            margin: 6px 0 0;
+            font-weight: 600;
+        }
+
+        .expr-line span { color: var(--accent); }
+
+        /* --- Level 2: Venn board + draggable items --- */
+        .venn-wrap {
+            position: relative;
+            width: 100%;
+        }
+
+        .venn-items {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 15px;
+            background: #f1f5f9;
+            border-radius: var(--radius);
+            border: 2px dashed #cbd5e1;
+            min-height: 90px;
+        }
+
+        .item {
+            min-width: 50px;
+            height: 50px;
+            padding: 0 12px;
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            border-radius: 25px;
+            border: 3px solid var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1rem;
+            color: white;
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
+            box-shadow: var(--shadow);
+            touch-action: none;
+            position: relative;
+            z-index: 10;
+            pointer-events: auto;
+        }
+
+        .item.placed {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            height: 40px;
+            min-width: 40px;
+            padding: 0 9px;
+            font-size: .9rem;
+            border-radius: 20px;
+            border-width: 2px;
+        }
+
+        /* must come after .placed so it wins */
+        .item.dragging {
+            position: fixed;
+            z-index: 9999;
+            opacity: .92;
+            cursor: grabbing;
+            transform: translate(-50%, -50%) scale(1.12);
+        }
+
+        /* --- Action Buttons --- */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+
+        .action-btn {
+            padding: 12px;
+            border-radius: var(--radius);
+            border: none;
+            font-weight: 700;
+            font-size: .8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .check-btn {
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            color: white;
+        }
+
+        .check-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+        .reset-btn {
+            background: var(--light);
+            color: var(--dark);
+            border: 2px solid var(--accent);
+        }
+
+        /* --- Ad Container --- */
+        .ad-container {
+            background: white;
+            border-radius: 8px;
+            padding: 6px;
+            margin-top: 6px;
+            border: 1px solid rgba(0,0,0,.1);
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,.05);
+            flex-shrink: 0;
+        }
+
+        .ad-label {
+            font-size: .65rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .ad-content {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 6px;
+            padding: 12px 8px;
+            color: #666;
+            font-size: .7rem;
+            border: 1px dashed #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        /* --- Overlays --- */
+        .lesson-overlay, .feedback-overlay, .completion-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all .3s ease;
+        }
+
+        .lesson-overlay.show, .feedback-overlay.show, .completion-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .lesson-card, .feedback-card, .completion-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            max-width: 350px;
+            width: 90%;
+            box-shadow: 0 15px 30px rgba(0,0,0,.3);
+        }
+
+        .feedback-card { text-align: center; }
+
+        .lesson-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .lesson-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .close-lesson {
+            background: rgba(52,152,219,.1);
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            color: var(--accent);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lesson-content {
+            color: var(--dark);
+            line-height: 1.4;
+            font-size: .85rem;
+            margin-bottom: 15px;
+        }
+
+        .lesson-example {
+            background: rgba(52,152,219,.1);
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 12px;
+            font-size: .8rem;
+        }
+
+        .lesson-close-btn {
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-weight: 700;
+            font-size: .85rem;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .feedback-icon { font-size: 2.5rem; margin-bottom: 12px; }
+
+        .feedback-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .feedback-message {
+            color: var(--dark);
+            margin-bottom: 15px;
+            line-height: 1.4;
+            font-size: .85rem;
+        }
+
+        .feedback-btn {
+            background: linear-gradient(135deg, var(--secondary), var(--orange));
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: var(--radius);
+            font-weight: 700;
+            font-size: .9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+        }
+
+        .completion-card { text-align: center; }
+
+        .completion-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .completion-subtitle {
+            font-size: 1.1rem;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+
+        .completion-message {
+            color: var(--dark);
+            margin-bottom: 20px;
+            line-height: 1.4;
+            font-size: .9rem;
+        }
+
+        .completion-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .completion-btn {
+            padding: 12px;
+            border-radius: var(--radius);
+            border: none;
+            font-weight: 700;
+            font-size: .85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .play-again-btn {
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            color: white;
+        }
+
+        .home-btn {
+            background: var(--light);
+            color: var(--dark);
+            border: 2px solid var(--accent);
+        }
+
+        /* --- Micro-lesson Bar --- */
+        .operations-bar {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: var(--radius);
+            padding: 10px;
+            color: white;
+            box-shadow: var(--shadow);
+            margin-top: 0;
+            flex-shrink: 0;
+        }
+
+        .operations-bar .inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .operations-bar .text {
+            font-size: .75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .op-btn {
+            background: rgba(255,255,255,.2);
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 6px;
+            padding: 6px 10px;
+            color: white;
+            font-weight: 700;
+            font-size: .8rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .op-btn:hover {
+            background: rgba(255,255,255,.3);
+            transform: translateY(-1px);
+        }
+
+        /* --- Instructions Panel --- */
+        .instructions-panel {
+            background: var(--light);
+            border-radius: var(--radius);
+            padding: 8px 10px;
+            box-shadow: var(--shadow);
+            flex-shrink: 0;
+            border-left: 3px solid var(--yellow);
+        }
+
+        .instructions-text {
+            font-size: .7rem;
+            color: var(--dark);
+            line-height: 1.3;
+            font-weight: 600;
+        }
+
+        /* --- Animations --- */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .shake { animation: shake .5s ease; }
+
+        /* --- Utility Classes --- */
+        .seo-content {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 380px) {
+            .game-title { font-size: 1rem; }
+            .score-panel { gap: 4px; }
+            .score-item { padding: 4px 6px; font-size: .7rem; }
+            .level-card { padding: 15px; }
+            .level-title { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Level Selection Screen -->
+    <div id="levelSelection" class="game-container">
+        <header class="game-header">
+            <div class="header-top">
+                <button class="back-btn" id="backBtn" aria-label="Go back"><i class="fas fa-arrow-left"></i></button>
+                <h1 class="game-title">Venn Diagram Challenge</h1>
+                <div style="width:44px"></div>
+            </div>
+        </header>
+
+        <main class="level-selection">
+            <div class="level-card" id="level1Select">
+                <div class="level-icon"><i class="fas fa-crosshairs"></i></div>
+                <h2 class="level-title">Level 1: Region Master</h2>
+                <p class="level-description">Identify and tap the correct regions in Venn diagrams. Master set theory notation and visual recognition.</p>
+                <div class="level-difficulty easy">Easy</div>
+            </div>
+
+            <div class="level-card" id="level2Select">
+                <div class="level-icon"><i class="fas fa-sort-amount-down"></i></div>
+                <h2 class="level-title">Level 2: Sort Master</h2>
+                <p class="level-description">Drag and drop elements into correct Venn diagram regions. Test your understanding of set membership.</p>
+                <div class="level-difficulty medium">Medium</div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Level 1 Container -->
+    <div id="level1-container" class="game-container hidden">
+        <header class="game-header">
+            <div class="header-top">
+                <button class="back-btn" id="backBtn1" aria-label="Go back"><i class="fas fa-arrow-left"></i></button>
+                <h1 class="game-title">Venn Region Master</h1>
+                <div style="width:44px"></div>
+            </div>
+            <div class="score-panel">
+                <div class="score-item"><i class="fas fa-star" style="color:var(--yellow)"></i><span>Score:</span><span class="value" id="score1">0</span></div>
+                <div class="score-item"><i class="fas fa-trophy" style="color:var(--green)"></i><span>Question:</span><span class="value" id="question1">1/10</span></div>
+            </div>
+            <div class="objective-panel"><p class="objective-text" id="objectiveText1">Tap the region(s) that match: A ∩ B</p></div>
+            <div class="progress-container"><div class="progress-bar" id="progressBar1"></div></div>
+        </header>
+
+        <main class="game-content">
+            <div class="target-section">
+                <div class="target-header"><h3 class="target-name"><i class="fas fa-bullseye"></i>Task</h3></div>
+                <div class="target-elements" id="targetElements"></div>
+            </div>
+
+            <div class="operations-bar">
+                <div class="inner">
+                    <div class="text"><i class="fas fa-graduation-cap"></i><span>Micro-lesson: Venn Diagrams</span></div>
+                    <button class="op-btn" id="openLessonBtn1">Learn More</button>
+                </div>
+            </div>
+
+            <div class="instructions-panel">
+                <p class="instructions-text"><i class="fas fa-info-circle" style="color:var(--accent)"></i> Tap the regions of the diagram that match the expression, then press Check Answer.</p>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn check-btn" id="checkBtn1" disabled><i class="fas fa-check"></i>Check Answer</button>
+                <button class="action-btn reset-btn" id="resetBtn1"><i class="fas fa-redo"></i>Reset</button>
+            </div>
+
+            <div class="ad-container" aria-label="Advertisement">
+                <div class="ad-label">Sponsored</div>
+                <div class="ad-content"><div class="ad-placeholder">Ad Space</div></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Level 2 Container -->
+    <div id="level2-container" class="game-container hidden">
+        <header class="game-header">
+            <div class="header-top">
+                <button class="back-btn" id="backBtn2" aria-label="Go back"><i class="fas fa-arrow-left"></i></button>
+                <h1 class="game-title">Venn Sort Master</h1>
+                <div style="width:44px"></div>
+            </div>
+            <div class="score-panel">
+                <div class="score-item"><i class="fas fa-star" style="color:var(--yellow)"></i><span>Score:</span><span class="value" id="score2">0</span></div>
+                <div class="score-item"><i class="fas fa-trophy" style="color:var(--green)"></i><span>Question:</span><span class="value" id="question2">1/15</span></div>
+            </div>
+            <div class="objective-panel"><p class="objective-text" id="objectiveText2"></p></div>
+            <div class="progress-container"><div class="progress-bar" id="progressBar2"></div></div>
+        </header>
+
+        <main class="game-content">
+            <div class="target-section">
+                <div class="target-header"><h3 class="target-name"><i class="fas fa-hand-pointer"></i>Drag the items into the diagram</h3></div>
+                <div class="target-elements">
+                    <div class="venn-wrap" id="vennBox">
+                        <div id="vennSvgHolder"></div>
+                        <div class="venn-items" id="vennItems"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pool" id="poolBox"></div>
+
+            <div class="operations-bar">
+                <div class="inner">
+                    <div class="text"><i class="fas fa-graduation-cap"></i><span>Micro-lesson: Venn Diagrams</span></div>
+                    <button class="op-btn" id="openLessonBtn2">Learn More</button>
+                </div>
+            </div>
+
+            <div class="instructions-panel">
+                <p class="instructions-text"><i class="fas fa-info-circle" style="color:var(--accent)"></i> Drag each item into its region. Drag it out of the diagram to send it back.</p>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn check-btn" id="checkBtn2" disabled><i class="fas fa-check"></i>Check Answer</button>
+                <button class="action-btn reset-btn" id="resetBtn2"><i class="fas fa-redo"></i>Reset</button>
+            </div>
+
+            <div class="ad-container" aria-label="Advertisement">
+                <div class="ad-label">Sponsored</div>
+                <div class="ad-content"><div class="ad-placeholder">Ad Space</div></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Shared Overlays -->
+    <div class="lesson-overlay" id="lessonOverlay">
+        <div class="lesson-card">
+            <div class="lesson-header">
+                <h2 class="lesson-title" id="lessonTitle"><i class="fas fa-graduation-cap"></i>Micro-lesson</h2>
+                <button class="close-lesson" id="closeLesson" aria-label="Close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="lesson-content" id="lessonContent"></div>
+            <div class="lesson-example" id="lessonExample"></div>
+            <button class="lesson-close-btn" id="closeLessonBtn">Got it, let's continue!</button>
+        </div>
+    </div>
+
+    <div class="feedback-overlay" id="feedbackOverlay">
+        <div class="feedback-card">
+            <div class="feedback-icon" id="feedbackIcon">🎉</div>
+            <h2 class="feedback-title" id="feedbackTitle">Perfect!</h2>
+            <p class="feedback-message" id="feedbackMessage"></p>
+            <button class="feedback-btn" id="nextBtn">Next</button>
+        </div>
+    </div>
+
+    <div class="completion-overlay" id="completionOverlay">
+        <div class="completion-card">
+            <div style="font-size:3rem;margin-bottom:12px">🎉</div>
+            <h2 class="completion-title" id="completionTitle">Region Master!</h2>
+            <div class="completion-subtitle">Final Score: <span id="finalScore">0</span>/<span id="maxScore">1500</span></div>
+            <p class="completion-message" id="completionMessage">You completed all questions!</p>
+            <div id="perfectMessage" style="display:none;color:#27AE60;font-weight:bold;margin-bottom:15px">🎊 NO MISTAKES! 🎊</div>
+            <div class="completion-buttons">
+                <button class="completion-btn play-again-btn" id="playAgainBtn"><i class="fas fa-redo"></i>Play Again</button>
+                <button class="completion-btn home-btn" id="homeBtn"><i class="fas fa-home"></i>Back to Levels</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEO Content -->
+    <div class="seo-content">
+        <h1>Venn Diagram Games - Interactive Mathematics Games</h1>
+        <p>Master Venn diagrams with two addictive levels: Region Master and Sort Master. Learn set theory through interactive gameplay.</p>
+    </div>
+
+    <script>
+        // ===========================
+        // CONSTANTS & HELPERS
+        // ===========================
+        const GAME_TYPES = { LEVEL1: 'level1', LEVEL2: 'level2' };
+
+        // Venn geometry (SVG viewBox 400 x 300)
+        const VB_W = 400, VB_H = 300;
+        const CA = { x: 150, y: 150 }, CB = { x: 250, y: 150 }, RAD = 80;
+        const IY1 = 150 - Math.sqrt(RAD * RAD - 50 * 50); // top intersection y
+        const IY2 = 150 + Math.sqrt(RAD * RAD - 50 * 50); // bottom intersection y
+
+        // Max points per question: 100 base + up to 50 speed bonus
+        const MAX_PER_Q = 150;
+
+        function speedBonus(ms, windowMs) {
+            return Math.max(0, Math.min(50, Math.floor((windowMs - ms) / 1000) * 5));
+        }
+
+        function zoneAt(x, y) {
+            const inA = Math.hypot(x - CA.x, y - CA.y) < RAD;
+            const inB = Math.hypot(x - CB.x, y - CB.y) < RAD;
+            if (inA && inB) return 'BOTH';
+            if (inA) return 'A';
+            if (inB) return 'B';
+            return 'U';
+        }
+
+        // Builds the golden-circle Venn diagram used by BOTH levels.
+        // mode 'select' -> tappable regions (level 1); mode 'sort' -> labels only (level 2)
+        function buildVennSVG(mode) {
+            const a = IY1.toFixed(2), b = IY2.toFixed(2);
+            const pathA   = `M200,${a} A80,80 0 1,0 200,${b} A80,80 0 0,1 200,${a} Z`;   // A only
+            const pathB   = `M200,${a} A80,80 0 1,1 200,${b} A80,80 0 0,0 200,${a} Z`;   // B only
+            const pathAB  = `M200,${a} A80,80 0 0,1 200,${b} A80,80 0 0,1 200,${a} Z`;   // lens
+            const pathU   = `M10,10 H390 V290 H10 Z M200,${a} A80,80 0 1,0 200,${b} A80,80 0 1,0 200,${a} Z`; // outside both
+
+            let regions = '';
+            if (mode === 'select') {
+                regions = `
+                  <path id="reg-U" class="region" data-region="reg-U" fill-rule="evenodd" d="${pathU}"/>
+                  <path id="region-A" class="region" data-region="region-A" d="${pathA}"/>
+                  <path id="region-B" class="region" data-region="region-B" d="${pathB}"/>
+                  <path id="region-AB" class="region" data-region="region-AB" d="${pathAB}"/>`;
+            }
+
+            const labels = mode === 'select'
+                ? `<text x="100" y="157" class="venn-label">A</text>
+                   <text x="300" y="157" class="venn-label">B</text>`
+                : `<text x="100" y="157" class="venn-label">A</text>
+                   <text x="300" y="157" class="venn-label">B</text>
+                   <text x="200" y="40" class="venn-label small">A ∩ B = middle</text>
+                   <text x="200" y="278" class="venn-label small">(A ∪ B)′ = outside</text>`;
+
+            return `
+            <svg class="venn-svg" viewBox="0 0 ${VB_W} ${VB_H}" xmlns="http://www.w3.org/2000/svg">
+              <rect x="10" y="10" width="380" height="280" rx="15" fill="#ffffff"/>
+              ${regions}
+              <rect class="outline" x="10" y="10" width="380" height="280" rx="15"/>
+              <circle class="outline" cx="150" cy="150" r="80"/>
+              <circle class="outline" cx="250" cy="150" r="80"/>
+              ${labels}
+              <text x="28" y="34" class="venn-label small">U</text>
+            </svg>`;
+        }
+
+        // ===========================
+        // LEVEL 1 DATA
+        // Universe U={1,2,3,4,5,6}, A={1,2,3}, B={3,4,5}
+        // ===========================
+        const EX = 'U = {1,2,3,4,5,6}, A = {1,2,3}, B = {3,4,5}.';
+        const REGION_QUESTIONS = [
+            {expr:"A ∩ B", correct:["region-AB"], title:"Intersection A ∩ B", content:"The intersection contains only elements that are in <strong>both</strong> sets.", example:`${EX}<br>A ∩ B = {3}.`},
+            {expr:"A ∪ B", correct:["region-A","region-B","region-AB"], title:"Union A ∪ B", content:"The union contains every element that is in <strong>either</strong> set (no duplicates).", example:`${EX}<br>A ∪ B = {1, 2, 3, 4, 5}.`},
+            {expr:"A'", correct:["region-B","reg-U"], title:"Complement A'", content:"A' (read \"A-prime\") is everything in the universal set <strong>except</strong> A.", example:`${EX}<br>A' = {4, 5, 6}.`},
+            {expr:"B'", correct:["region-A","reg-U"], title:"Complement B'", content:"B' is everything in the universal set that is <strong>not</strong> in B.", example:`${EX}<br>B' = {1, 2, 6}.`},
+            {expr:"A - B", correct:["region-A"], title:"Difference A - B", content:"A - B (or A \\ B) contains elements that are in A <strong>but not</strong> in B.", example:`${EX}<br>A - B = {1, 2}.`},
+            {expr:"B - A", correct:["region-B"], title:"Difference B - A", content:"B - A contains elements that are in B <strong>but not</strong> in A.", example:`${EX}<br>B - A = {4, 5}.`},
+            {expr:"(A ∪ B)'", correct:["reg-U"], title:"Outside A ∪ B", content:"The complement of the union is everything <strong>outside both circles</strong>.", example:`${EX}<br>(A ∪ B)' = {6}.`},
+            {expr:"(A ∩ B)'", correct:["region-A","region-B","reg-U"], title:"Outside A ∩ B", content:"The complement of the intersection is everything <strong>except the overlap</strong>.", example:`${EX}<br>(A ∩ B)' = {1, 2, 4, 5, 6}.`},
+            {expr:"U", correct:["region-A","region-B","region-AB","reg-U"], title:"Universal Set U", content:"The universal set contains <strong>every element under discussion</strong>: the whole rectangle.", example:`${EX}`},
+            {expr:"∅", correct:[], title:"Empty Set ∅", content:"The empty set contains <strong>no elements</strong>. Select nothing and press Check.", example:"A ∩ A' = ∅."}
+        ];
+
+        // ===========================
+        // LEVEL 2 DATA
+        // ===========================
+        const LEVEL2_QUESTIONS = [
+            { q: "Place x in A ∩ B (Intersection)", items: [{v:'x', z:'BOTH'}],
+              lesson: "The <b>Intersection</b> (A ∩ B) is the middle overlap where elements belong to both sets.",
+              title: "Intersection A ∩ B" },
+            { q: "A={1, 2}, B={2, 3}. Sort all.", items: [{v:'1', z:'A'}, {v:'2', z:'BOTH'}, {v:'3', z:'B'}],
+              lesson: "Shared items go in the middle. Unique items go in the outer crescents.",
+              title: "Set Membership" },
+            { q: "Place '7' in the Complement (A ∪ B)'", items: [{v:'7', z:'U'}],
+              lesson: "The <b>Complement</b> of the union is the space outside both circles.",
+              title: "Complement of Union" },
+            { q: "If A ⊂ B, where do elements of A go?", items: [{v:'a', z:'BOTH'}],
+              lesson: "If A is a <b>subset</b> of B, all of A's elements must also be in B, so they sit in the overlap.",
+              title: "Subset Relation" },
+            { q: "Difference A - B. A={5, 6}, B={6}.", items: [{v:'5', z:'A'}, {v:'6', z:'BOTH'}],
+              lesson: "<b>A - B</b> means items in A that are NOT in B.",
+              title: "Set Difference A - B" },
+            { q: "Sort '2' for A={Even}, B={Prime}.", items: [{v:'2', z:'BOTH'}],
+              lesson: "2 is unique! It is the only even prime number.",
+              title: "Special Number Properties" },
+            { q: "Disjoint Sets: A={1}, B={2}.", items: [{v:'1', z:'A'}, {v:'2', z:'B'}],
+              lesson: "Disjoint sets share no elements. The intersection is empty.",
+              title: "Disjoint Sets" },
+            { q: "Place 'z' in B - A.", items: [{v:'z', z:'B'}],
+              lesson: "B - A is the part of B that does not touch A.",
+              title: "Set Difference B - A" },
+            { q: "Symmetric Difference: A={x}, B={y}.", items: [{v:'x', z:'A'}, {v:'y', z:'B'}],
+              lesson: "This is (A ∪ B) - (A ∩ B): everything except the middle.",
+              title: "Symmetric Difference" },
+            { q: "U={1,2,3}, A={1}, B={2}. Place 3.", items: [{v:'3', z:'U'}],
+              lesson: "3 exists in the Universal set but outside both A and B.",
+              title: "Universal Set Elements" },
+            { q: "If A = B, place 'k' (k is in A).", items: [{v:'k', z:'BOTH'}],
+              lesson: "Equal sets share all members. Place the element in the overlap.",
+              title: "Equal Sets" },
+            { q: "A={factors of 4}, B={factors of 6}. Sort 2.", items: [{v:'2', z:'BOTH'}],
+              lesson: "2 is a factor of both 4 and 6.",
+              title: "Number Factors" },
+            { q: "A={Red, Blue}, B={Yellow}. Place all.", items: [{v:'Red', z:'A'}, {v:'Blue', z:'A'}, {v:'Yellow', z:'B'}],
+              lesson: "No common colors means zero intersection.",
+              title: "Color Sets" },
+            { q: "Place 'u' in (A ∪ B)'.", items: [{v:'u', z:'U'}],
+              lesson: "The region outside both sets.",
+              title: "Complement of Union" },
+            { q: "Final: A={x,y}, B={y,z}. Sort all.", items: [{v:'x', z:'A'}, {v:'y', z:'BOTH'}, {v:'z', z:'B'}],
+              lesson: "Excellent! Only y is shared, so it goes in the middle.",
+              title: "Final Challenge" }
+        ];
+
+        // ===========================
+        // DOM ELEMENTS
+        // ===========================
+        const $ = id => document.getElementById(id);
+        const elements = {
+            levelSelection: $('levelSelection'),
+            level1Select: $('level1Select'),
+            level2Select: $('level2Select'),
+
+            level1Container: $('level1-container'),
+            score1: $('score1'),
+            question1: $('question1'),
+            objectiveText1: $('objectiveText1'),
+            progressBar1: $('progressBar1'),
+            targetElements: $('targetElements'),
+            checkBtn1: $('checkBtn1'),
+            resetBtn1: $('resetBtn1'),
+            backBtn1: $('backBtn1'),
+            openLessonBtn1: $('openLessonBtn1'),
+
+            level2Container: $('level2-container'),
+            score2: $('score2'),
+            question2: $('question2'),
+            objectiveText2: $('objectiveText2'),
+            progressBar2: $('progressBar2'),
+            vennSvgHolder: $('vennSvgHolder'),
+            vennItems: $('vennItems'),
+            poolBox: $('poolBox'),
+            checkBtn2: $('checkBtn2'),
+            resetBtn2: $('resetBtn2'),
+            backBtn2: $('backBtn2'),
+            openLessonBtn2: $('openLessonBtn2'),
+
+            lessonOverlay: $('lessonOverlay'),
+            lessonTitle: $('lessonTitle'),
+            lessonContent: $('lessonContent'),
+            lessonExample: $('lessonExample'),
+            closeLesson: $('closeLesson'),
+            closeLessonBtn: $('closeLessonBtn'),
+
+            feedbackOverlay: $('feedbackOverlay'),
+            feedbackIcon: $('feedbackIcon'),
+            feedbackTitle: $('feedbackTitle'),
+            feedbackMessage: $('feedbackMessage'),
+            nextBtn: $('nextBtn'),
+
+            completionOverlay: $('completionOverlay'),
+            completionTitle: $('completionTitle'),
+            finalScore: $('finalScore'),
+            maxScore: $('maxScore'),
+            completionMessage: $('completionMessage'),
+            perfectMessage: $('perfectMessage'),
+            playAgainBtn: $('playAgainBtn'),
+            homeBtn: $('homeBtn'),
+
+            backBtn: $('backBtn')
+        };
+
+        function showFeedback(ok, okMsg, badMsg, badTitle) {
+            elements.feedbackIcon.textContent = ok ? '🎉' : '💡';
+            elements.feedbackTitle.textContent = ok ? 'Perfect!' : badTitle;
+            elements.feedbackMessage.textContent = ok ? okMsg : badMsg;
+            elements.nextBtn.textContent = ok ? 'Next' : 'Try Again';
+            elements.feedbackOverlay.classList.add('show');
+        }
+
+        // ===========================
+        // LEVEL 1 GAME LOGIC
+        // ===========================
+        class Level1Game {
+            constructor() {
+                this.type = GAME_TYPES.LEVEL1;
+                this.total = REGION_QUESTIONS.length;
+                this.selectedRegions = new Set();
+                this.lastCorrect = false;
+            }
+
+            init() {
+                this.currentQ = 0;
+                this.score = 0;
+                this.mistakes = 0;
+                this.qMistakes = 0;
+                this.loadQuestion();
+            }
+
+            loadQuestion() {
+                const q = REGION_QUESTIONS[this.currentQ];
+                this.questionStart = Date.now();
+                this.qMistakes = 0;
+                this.selectedRegions.clear();
+
+                elements.objectiveText1.textContent = `Tap the region(s) that match: ${q.expr}`;
+                elements.question1.textContent = `${this.currentQ + 1}/${this.total}`;
+                elements.progressBar1.style.width = `${(this.currentQ + 1) / this.total * 100}%`;
+                elements.score1.textContent = this.score;
+                this.renderVenn(q);
+                this.updateMicroLesson();
+
+                if (this.currentQ === 0) elements.lessonOverlay.classList.add('show');
+                this.updateCheckButton();
+            }
+
+            renderVenn(q) {
+                elements.targetElements.innerHTML =
+                    buildVennSVG('select') +
+                    `<div class="expr-line">Expression: <span>${q.expr}</span></div>`;
+
+                elements.targetElements.querySelectorAll('.region').forEach(node => {
+                    node.addEventListener('click', e => {
+                        e.stopPropagation();
+                        this.toggleRegion(node.dataset.region, node);
+                    });
+                });
+            }
+
+            toggleRegion(regionId, node) {
+                if (this.selectedRegions.has(regionId)) {
+                    this.selectedRegions.delete(regionId);
+                    node.classList.remove('glow');
+                } else {
+                    this.selectedRegions.add(regionId);
+                    node.classList.add('glow');
+                }
+                this.updateCheckButton();
+            }
+
+            updateCheckButton() {
+                const q = REGION_QUESTIONS[this.currentQ];
+                // For the empty set, "select nothing" is a valid answer
+                elements.checkBtn1.disabled = q.expr === "∅" ? false : this.selectedRegions.size === 0;
+            }
+
+            updateMicroLesson() {
+                const q = REGION_QUESTIONS[this.currentQ];
+                elements.lessonTitle.innerHTML = `<i class="fas fa-graduation-cap"></i> ${q.title}`;
+                elements.lessonContent.innerHTML = q.content;
+                elements.lessonExample.innerHTML = `<div style="font-weight:700;margin-bottom:4px">Example:</div>${q.example}`;
+            }
+
+            checkAnswer() {
+                const q = REGION_QUESTIONS[this.currentQ];
+                const selected = Array.from(this.selectedRegions).sort();
+                const correct = q.correct.slice().sort();
+                const isCorrect = selected.length === correct.length && selected.every((v, i) => v === correct[i]);
+
+                this.lastCorrect = isCorrect;
+                if (isCorrect) {
+                    const bonus = this.qMistakes === 0 ? speedBonus(Date.now() - this.questionStart, 15000) : 0;
+                    this.score += 100 + bonus;
+                    elements.score1.textContent = this.score;
+                    showFeedback(true, `+${100 + bonus} points (100 base, ${bonus} speed bonus)`);
+                } else {
+                    this.qMistakes++;
+                    this.mistakes++;
+                    showFeedback(false, '', 'Not quite. Review the micro-lesson and tap again!', 'Try again');
+                }
+            }
+
+            nextQuestion() {
+                this.currentQ++;
+                if (this.currentQ >= this.total) this.showCompletion();
+                else this.loadQuestion();
+            }
+
+            showCompletion() {
+                elements.finalScore.textContent = this.score;
+                elements.maxScore.textContent = this.total * MAX_PER_Q;
+                elements.completionTitle.textContent = "Region Master!";
+                elements.completionMessage.textContent = `You completed all ${this.total} regions!`;
+                elements.perfectMessage.style.display = this.mistakes === 0 ? 'block' : 'none';
+                elements.completionOverlay.classList.add('show');
+            }
+
+            resetSelection() {
+                this.selectedRegions.clear();
+                elements.targetElements.querySelectorAll('.region.glow').forEach(n => n.classList.remove('glow'));
+                this.updateCheckButton();
+            }
+        }
+
+        // ===========================
+        // LEVEL 2 GAME LOGIC
+        // ===========================
+        class Level2Game {
+            constructor() {
+                this.type = GAME_TYPES.LEVEL2;
+                this.total = LEVEL2_QUESTIONS.length;
+                this.lastCorrect = false;
+            }
+
+            init() {
+                this.currentQ = 0;
+                this.score = 0;
+                this.mistakes = 0;
+                this.qMistakes = 0;
+                this.loadQuestion();
+            }
+
+            loadQuestion() {
+                const q = LEVEL2_QUESTIONS[this.currentQ];
+                this.questionStart = Date.now();
+                this.qMistakes = 0;
+
+                elements.objectiveText2.textContent = q.q;
+                elements.question2.textContent = `${this.currentQ + 1}/${this.total}`;
+                elements.progressBar2.style.width = `${(this.currentQ + 1) / this.total * 100}%`;
+                elements.score2.textContent = this.score;
+
+                // Fresh diagram (same golden-circle look as level 1)
+                elements.vennSvgHolder.innerHTML = buildVennSVG('sort');
+                this.vennSvg = elements.vennSvgHolder.querySelector('svg');
+
+                // Clear old items, create new ones in the pool
+                elements.vennItems.innerHTML = '';
+                elements.poolBox.innerHTML = '';
+                q.items.forEach(data => {
+                    const el = document.createElement('div');
+                    el.className = 'item';
+                    el.textContent = data.v;
+                    el.dataset.target = data.z;
+                    el.addEventListener('pointerdown', e => this.onDragStart(e, el));
+                    elements.poolBox.appendChild(el);
+                });
+
+                this.updateMicroLesson();
+                this.updateCheckButton();
+            }
+
+            updateMicroLesson() {
+                const q = LEVEL2_QUESTIONS[this.currentQ];
+                elements.lessonTitle.innerHTML = `<i class="fas fa-graduation-cap"></i> ${q.title}`;
+                elements.lessonContent.innerHTML = q.lesson;
+                elements.lessonExample.innerHTML = `<div style="font-weight:700;margin-bottom:4px">Tip:</div>Drag each element to the correct region. Drag a placed item to move it, or drop it outside the diagram to send it back.`;
+            }
+
+            // --- Dragging ---------------------------------------------------
+            // The element is never re-parented while the pointer is down
+            // (that would break pointer capture); it only gets position:fixed
+            // via the .dragging class. All inline positions are reset on every
+            // drop so an item can be dragged any number of times.
+            onDragStart(e, el) {
+                if (e.pointerType === 'mouse' && e.button !== 0) return;
+                e.preventDefault();
+
+                const id = e.pointerId;
+                try { el.setPointerCapture(id); } catch (_) {}
+                el.classList.add('dragging');
+                this.moveTo(el, e.clientX, e.clientY);
+
+                const move = ev => {
+                    if (ev.pointerId !== id) return;
+                    this.moveTo(el, ev.clientX, ev.clientY);
+                };
+                const up = ev => {
+                    if (ev.pointerId !== id) return;
+                    el.removeEventListener('pointermove', move);
+                    el.removeEventListener('pointerup', up);
+                    el.removeEventListener('pointercancel', up);
+                    try { el.releasePointerCapture(id); } catch (_) {}
+                    this.drop(el, ev.clientX, ev.clientY, ev.type === 'pointercancel');
+                };
+                el.addEventListener('pointermove', move);
+                el.addEventListener('pointerup', up);
+                el.addEventListener('pointercancel', up);
+            }
+
+            moveTo(el, x, y) {
+                el.style.left = x + 'px';
+                el.style.top = y + 'px';
+            }
+
+            drop(el, clientX, clientY, cancelled) {
+                el.classList.remove('dragging');
+
+                const r = this.vennSvg.getBoundingClientRect();
+                const inside = !cancelled &&
+                    clientX >= r.left && clientX <= r.right &&
+                    clientY >= r.top && clientY <= r.bottom;
+
+                if (inside) {
+                    // convert to viewBox coordinates, keep the item fully visible
+                    let vx = (clientX - r.left) / r.width * VB_W;
+                    let vy = (clientY - r.top) / r.height * VB_H;
+                    vx = Math.min(VB_W - 22, Math.max(22, vx));
+                    vy = Math.min(VB_H - 22, Math.max(22, vy));
+
+                    el.dataset.actualZone = zoneAt(vx, vy);
+                    el.classList.add('placed');
+                    el.style.left = (vx / VB_W * 100) + '%';
+                    el.style.top = (vy / VB_H * 100) + '%';
+                    elements.vennItems.appendChild(el);
+                } else {
+                    this.sendToPool(el);
+                }
+                this.updateCheckButton();
+            }
+
+            sendToPool(el) {
+                el.classList.remove('placed', 'dragging');
+                delete el.dataset.actualZone;
+                el.style.left = '';
+                el.style.top = '';
+                elements.poolBox.appendChild(el);
+            }
+
+            placedItems() {
+                return elements.vennItems.querySelectorAll('.item.placed');
+            }
+
+            updateCheckButton() {
+                const need = LEVEL2_QUESTIONS[this.currentQ].items.length;
+                elements.checkBtn2.disabled = this.placedItems().length !== need;
+            }
+
+            // --- Checking ---------------------------------------------------
+            checkAnswer() {
+                const placed = this.placedItems();
+                const need = LEVEL2_QUESTIONS[this.currentQ].items.length;
+                if (placed.length !== need) return;
+
+                let correct = true;
+                placed.forEach(i => {
+                    if (i.dataset.target !== i.dataset.actualZone) correct = false;
+                });
+
+                this.lastCorrect = correct;
+                if (correct) {
+                    const bonus = this.qMistakes === 0 ? speedBonus(Date.now() - this.questionStart, 20000) : 0;
+                    this.score += 100 + bonus;
+                    elements.score2.textContent = this.score;
+                    showFeedback(true, `+${100 + bonus} points (100 base, ${bonus} speed bonus)`);
+                } else {
+                    this.qMistakes++;
+                    this.mistakes++;
+                    showFeedback(false, '', 'Some elements are in the wrong region. Review the lesson and try again!', 'Not Quite');
+                }
+            }
+
+            nextQuestion() {
+                this.currentQ++;
+                if (this.currentQ < this.total) this.loadQuestion();
+                else this.showCompletion();
+            }
+
+            showCompletion() {
+                elements.finalScore.textContent = this.score;
+                elements.maxScore.textContent = this.total * MAX_PER_Q;
+                elements.completionTitle.textContent = "Sort Master!";
+                elements.completionMessage.textContent = `You completed all ${this.total} sorting challenges!`;
+                elements.perfectMessage.style.display = this.mistakes === 0 ? 'block' : 'none';
+                elements.completionOverlay.classList.add('show');
+            }
+
+            resetSelection() {
+                Array.from(this.placedItems()).forEach(item => this.sendToPool(item));
+                this.updateCheckButton();
+            }
+        }
+
+        // ===========================
+        // GAME MANAGER
+        // ===========================
+        class GameManager {
+            constructor() {
+                this.currentGame = null;
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                elements.level1Select.addEventListener('click', () => this.startGame(GAME_TYPES.LEVEL1));
+                elements.level2Select.addEventListener('click', () => this.startGame(GAME_TYPES.LEVEL2));
+
+                // Back on the level-select screen leaves the game (if there is somewhere to go)
+                elements.backBtn.addEventListener('click', () => {
+                    if (window.history.length > 1) window.history.back();
+                });
+                elements.backBtn1.addEventListener('click', () => this.showLevelSelection());
+                elements.backBtn2.addEventListener('click', () => this.showLevelSelection());
+
+                elements.openLessonBtn1.addEventListener('click', () => this.showLesson());
+                elements.openLessonBtn2.addEventListener('click', () => this.showLesson());
+                elements.closeLesson.addEventListener('click', () => this.hideLesson());
+                elements.closeLessonBtn.addEventListener('click', () => this.hideLesson());
+
+                elements.checkBtn1.addEventListener('click', () => {
+                    if (this.currentGame && this.currentGame.type === GAME_TYPES.LEVEL1) this.currentGame.checkAnswer();
+                });
+                elements.checkBtn2.addEventListener('click', () => {
+                    if (this.currentGame && this.currentGame.type === GAME_TYPES.LEVEL2) this.currentGame.checkAnswer();
+                });
+
+                elements.resetBtn1.addEventListener('click', () => {
+                    if (this.currentGame && this.currentGame.type === GAME_TYPES.LEVEL1) this.currentGame.resetSelection();
+                });
+                elements.resetBtn2.addEventListener('click', () => {
+                    if (this.currentGame && this.currentGame.type === GAME_TYPES.LEVEL2) this.currentGame.resetSelection();
+                });
+
+                // Feedback: advance only after a correct answer; otherwise let the player retry
+                elements.nextBtn.addEventListener('click', () => {
+                    elements.feedbackOverlay.classList.remove('show');
+                    if (this.currentGame && this.currentGame.lastCorrect) {
+                        this.currentGame.lastCorrect = false;
+                        this.currentGame.nextQuestion();
+                    }
+                });
+
+                elements.playAgainBtn.addEventListener('click', () => {
+                    elements.completionOverlay.classList.remove('show');
+                    if (this.currentGame) this.currentGame.init();
+                });
+
+                elements.homeBtn.addEventListener('click', () => {
+                    elements.completionOverlay.classList.remove('show');
+                    this.showLevelSelection();
+                });
+            }
+
+            startGame(gameType) {
+                elements.levelSelection.classList.add('hidden');
+                if (gameType === GAME_TYPES.LEVEL1) {
+                    this.currentGame = new Level1Game();
+                    elements.level1Container.classList.remove('hidden');
+                    elements.level2Container.classList.add('hidden');
+                } else {
+                    this.currentGame = new Level2Game();
+                    elements.level1Container.classList.add('hidden');
+                    elements.level2Container.classList.remove('hidden');
+                }
+                window.scrollTo(0, 0);
+                this.currentGame.init();
+            }
+
+            showLevelSelection() {
+                elements.level1Container.classList.add('hidden');
+                elements.level2Container.classList.add('hidden');
+                elements.feedbackOverlay.classList.remove('show');
+                elements.completionOverlay.classList.remove('show');
+                elements.lessonOverlay.classList.remove('show');
+                elements.levelSelection.classList.remove('hidden');
+                this.currentGame = null;
+                window.scrollTo(0, 0);
+            }
+
+            showLesson() {
+                if (this.currentGame) elements.lessonOverlay.classList.add('show');
+            }
+
+            hideLesson() {
+                elements.lessonOverlay.classList.remove('show');
+            }
+        }
+
+        const gameManager = new GameManager();
+    </script>
+</body>
+</html>
